@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@berkelium/berkelium",
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "libs/berkelium/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

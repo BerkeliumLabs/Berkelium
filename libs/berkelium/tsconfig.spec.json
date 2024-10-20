@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc/libs/berkelium",
-    "module": "commonjs",
+    "module": "CommonJS",
     "types": ["jest", "node"]
   },
   "include": [
