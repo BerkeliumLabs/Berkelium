@@ -2,7 +2,10 @@
   "name": "@berkelium/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "nx run @berkelium/berkelium:build",
+    "test": "nx run @berkelium/berkelium:test"
+  },
   "private": true,
   "dependencies": {},
   "devDependencies": {
