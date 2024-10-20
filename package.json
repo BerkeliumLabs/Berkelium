@@ -37,6 +37,7 @@
     "typescript-eslint": "^8.0.0"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "libs/*"
   ]
 }
