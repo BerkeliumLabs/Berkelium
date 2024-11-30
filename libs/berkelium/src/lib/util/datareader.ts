@@ -1,4 +1,4 @@
-export class BkUtils {
+export class DataReader {
     readCSV(csvData: string, delimiter = ',') {
         // Split the data into rows
         const rows = csvData.trim().split("\n");
