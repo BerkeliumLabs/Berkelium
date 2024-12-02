@@ -1,12 +1,20 @@
 export class DataFrame {
   private data: Array<object>;
+  private headers: Array<string>;
 
   /**
    * Creates a DataFrame object.
    * @param {Array<Object>} data - Array of objects where keys are column names.
    */
   constructor(data: Array<object>) {
+    if (
+      !Array.isArray(data) ||
+      !data.every((item) => typeof item === 'object')
+    ) {
+      throw new Error('Data must be an array of objects');
+    }
     this.data = data;
+    this.headers = Object.keys(data[0] || {});
   }
 
   /**
@@ -25,6 +33,14 @@ export class DataFrame {
    */
   tail(n = 5): Array<object> {
     return this.data.slice(-n);
+  }
+
+  /**
+   * Returns an array with the number of rows and columns in the DataFrame.
+   * @returns {[number, number]} - [number of rows, number of columns]
+   */
+  shape(): [number, number] {
+    return [this.data.length, this.headers.length];
   }
 
   /**

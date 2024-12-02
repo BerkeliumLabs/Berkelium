@@ -24,4 +24,7 @@ describe('DataFrame', () => {
         console.table(df.tail());
         expect(df.tail()).toEqual(result.slice(-5));
     });
+    it('Should display the shape of the DataFrame', () => {
+        expect(df.shape()).toEqual([30, 5]);
+    });
 });
