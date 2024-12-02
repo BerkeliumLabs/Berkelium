@@ -7,7 +7,7 @@ export class DataReader {
      * @param {string} [delimiter=','] - The delimiter used to separate values in the CSV data.
      * @returns {Array<object>} An array of objects where each object corresponds to a row in the CSV data.
      */
-    readCSV(csvData: string, delimiter = ',') {
+    readCSV(csvData: string, delimiter = ','): Array<object> {
         // Split the data into rows
         const rows = csvData.trim().split("\n");
 
