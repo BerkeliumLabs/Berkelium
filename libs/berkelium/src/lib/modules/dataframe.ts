@@ -44,6 +44,14 @@ export class DataFrame {
   }
 
   /**
+   * Returns the column headers of the DataFrame.
+   * @returns {Array<string>} - An array of strings representing the column names.
+   */
+  columns(): Array<string> {
+    return this.headers;
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {
