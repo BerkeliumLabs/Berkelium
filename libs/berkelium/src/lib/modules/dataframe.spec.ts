@@ -17,6 +17,7 @@ describe('DataFrame', () => {
         expect(df).toBeTruthy();
     });
     it('Should display the first 5 rows of the DataFrame', () => {
+        console.table(df.head());
         expect(df.head()).toEqual(result.slice(0, 5));
     })
 });
