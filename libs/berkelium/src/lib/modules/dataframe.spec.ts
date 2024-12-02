@@ -19,5 +19,9 @@ describe('DataFrame', () => {
     it('Should display the first 5 rows of the DataFrame', () => {
         console.table(df.head());
         expect(df.head()).toEqual(result.slice(0, 5));
-    })
+    });
+    it('Should display the last 5 rows of the DataFrame', () => {
+        console.table(df.tail());
+        expect(df.tail()).toEqual(result.slice(-5));
+    });
 });
