@@ -47,7 +47,7 @@ export class DataFrame {
    * Returns the column headers of the DataFrame.
    * @returns {Array<string>} - An array of strings representing the column names.
    */
-  columns(): Array<string> {
+  get columns(): Array<string> {
     return this.headers;
   }
 
@@ -274,7 +274,7 @@ export class DataFrame {
     const summary: { [key: string]: DataSummary } = {};
 
     // Filter numeric columns
-    const numericColumns = this.columns().filter((col: string) =>
+    const numericColumns = this.headers.filter((col: string) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.data.every((row: any) => typeof row[col] === 'number')
     );

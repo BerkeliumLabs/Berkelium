@@ -28,7 +28,7 @@ describe('DataFrame', () => {
         expect(df.shape()).toEqual([30, 5]);
     });
     it('Should display the column headers of the DataFrame', () => {
-        expect(df.columns()).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth']);
+        expect(df.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth']);
     });
     it('Should display the info of the DataFrame', () => {
         df.info();
