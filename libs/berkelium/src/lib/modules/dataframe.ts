@@ -52,9 +52,65 @@ export class DataFrame {
   }
 
   /**
+   * Displays a concise summary of the DataFrame.
+   * The summary includes the number of rows and columns,
+   * as well as the number of non-null values in each column and the data type of each column.
+   * The summary is printed to the console in a tabular format.
+   */
+  info(): void {
+    const dfInfo: any = [];
+    this.headers.forEach((col) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const uniqueTypes = new Set(this.data.map((row: any) => typeof row[col]));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const nonNull = this.data.filter((row: any) => this.isNotEmpty(row[col]));
+      const infoRow = {
+        '#': this.headers.indexOf(col),
+        Column: col,
+        'Non-Null Count': nonNull.length,
+        Dtype: [...uniqueTypes].join(', '),
+      };
+      dfInfo.push(infoRow);
+    });
+    console.log(
+      `DataFrame Info:
+    Number of rows: ${this.data.length}
+    Number of columns: ${this.headers.length}\n`
+    );
+    console.table(dfInfo);
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {
     console.table(this.data);
+  }
+
+  /**
+   * Checks if the given value is not empty.
+   * A value is considered empty if it is null, undefined, false, an empty string, NaN, or an object with no keys.
+   * @param {any} value - The value to be checked.
+   * @returns {boolean} - True if the value is not empty, false if it is.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private isNotEmpty(value: any): boolean {
+    if (
+      value === null ||
+      value === undefined ||
+      value === false ||
+      value === '' ||
+      Number.isNaN(value)
+    ) {
+      return false;
+    }
+
+    if (typeof value === 'object') {
+      if (Object.keys(value).length === 0) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
