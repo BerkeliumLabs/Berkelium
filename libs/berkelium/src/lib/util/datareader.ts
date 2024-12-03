@@ -71,7 +71,6 @@ export class DataReader {
     const date = new Date(value);
     if (!isNaN(date.getTime())) return date;
 
-    // Try to parse as JSON object
     try {
       const parsed = JSON.parse(value);
       if (typeof parsed === 'object') return parsed;
@@ -79,6 +78,6 @@ export class DataReader {
       // Not a valid JSON string
     }
 
-    return value; // Return as string if no type matches
+    return value;
   }
 }

@@ -82,6 +82,18 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the count of non-null values in a column.
+   * @param {string} column - The column name.
+   * @returns {number} - Count of non-null values.
+   */
+  count(column: string): number {
+    return this.data.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (row: any) => this.isNotEmpty(row[column])
+    ).length;
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {

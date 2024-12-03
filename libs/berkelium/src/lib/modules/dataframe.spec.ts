@@ -33,4 +33,7 @@ describe('DataFrame', () => {
     it('Should display the info of the DataFrame', () => {
         df.info();
     });
+    it('Should display the count of non-null values in a column', () => {
+        expect(df.count('Monthly Income')).toEqual(25);
+    });
 });
