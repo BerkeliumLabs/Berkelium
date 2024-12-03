@@ -58,6 +58,7 @@ export class DataFrame {
    * The summary is printed to the console in a tabular format.
    */
   info(): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dfInfo: any = [];
     this.headers.forEach((col) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
