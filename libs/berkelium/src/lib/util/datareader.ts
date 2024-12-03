@@ -70,8 +70,8 @@ export class DataReader {
     if (/^\d+n$/.test(value)) return BigInt(value.slice(0, -1));
 
     // Try to parse as Date
-    const date = new Date(value);
-    if (!isNaN(date.getTime())) return date;
+    /* const date = new Date(value);
+    if (!isNaN(date.getTime())) return date; */
 
     try {
       const parsed = JSON.parse(value);
