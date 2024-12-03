@@ -107,6 +107,23 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the standard deviation of a numeric column.
+   * @param {string} column - The column name.
+   * @returns {number} - The standard deviation value.
+   */
+  std(column: string): number {
+    const values = this.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row[column])
+      .filter((val) => typeof val === 'number');
+    const mean = this.mean(column);
+    const variance =
+      values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      values.length;
+    return Number(Math.sqrt(variance).toFixed(6));
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {
