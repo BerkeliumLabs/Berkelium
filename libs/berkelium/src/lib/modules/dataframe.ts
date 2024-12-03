@@ -195,6 +195,24 @@ export class DataFrame {
   }
 
   /**
+   * Replaces `undefined` values in the DataFrame with a specified value.
+   * @param {*} value - The value to replace `undefined` with.
+   * @returns {void}
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fillna(value: any): void | DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.data = this.data.map((row: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const filledRow: { [key: string]: any } = {};
+      Object.keys(row).forEach((key) => {
+        filledRow[key] = row[key] == undefined ? value : row[key];
+      });
+      return filledRow;
+    });
+  }
+
+  /**
    * Returns summary statistics for all numeric columns in the DataFrame.
    * @returns {Object} - An object containing the summary statistics for numeric columns.
    */
@@ -218,7 +236,6 @@ export class DataFrame {
         '75%': this.quartiles(col)['75%'],
         max: this.max(col),
       };
-      console.log(summary[col]);
     }
 
     return summary;

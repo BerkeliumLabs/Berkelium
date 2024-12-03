@@ -57,8 +57,21 @@ describe('DataFrame', () => {
     });
     it('Should calculate the median of a numeric column', () => {
         expect(df.median('Monthly Income')).toEqual(62000);
-    })
+    });
+    /* it('Should calculate the mode of a numeric column', () => {
+        expect(df.mode('Monthly Income')).toEqual(45000);
+    }); */
+    /* it('Should calculate the sum of a numeric column', () => {
+        expect(df.sum('Monthly Income')).toEqual(1750000);
+    }); */
+    /* it('Should calculate the variance of a numeric column', () => {
+        expect(df.variance('Monthly Income')).toEqual(1750000);
+    }); */
+    it('Should fill null values with a specified value', () => {
+        df.fillna(0);
+    });
     it('Should display descriptive statistics for all numeric columns', () => {
+        df.fillna(0);
         console.log(df.describe());
         expect(df.describe()).toBeTruthy();
     });
