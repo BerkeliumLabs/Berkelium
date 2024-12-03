@@ -55,6 +55,9 @@ describe('DataFrame', () => {
     it('Should calculate quartiles of a numeric column', () => {
         expect(df.quartiles('Monthly Income')).toEqual({ '25%': 50000, '50%': 62000, '75%': 74000 });
     });
+    it('Should calculate the median of a numeric column', () => {
+        expect(df.median('Monthly Income')).toEqual(62000);
+    })
     it('Should display descriptive statistics for all numeric columns', () => {
         console.log(df.describe());
         expect(df.describe()).toBeTruthy();

@@ -186,6 +186,15 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the median of a numeric column.
+   * @param {string} column - The column name.
+   * @returns {number} - The median value.
+   */
+  median(column: string): number {
+    return this.quartiles(column)['50%'];
+  }
+
+  /**
    * Returns summary statistics for all numeric columns in the DataFrame.
    * @returns {Object} - An object containing the summary statistics for numeric columns.
    */
@@ -210,7 +219,7 @@ export class DataFrame {
         max: this.max(col),
       };
       console.log(summary[col]);
-    };
+    }
 
     return summary;
   }
