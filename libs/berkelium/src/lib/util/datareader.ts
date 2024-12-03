@@ -54,10 +54,12 @@ export class DataReader {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private inferType(value: string): any {
-    if (value === null || value === undefined || value === '') return value; // Keep null, undefined, or empty strings
+    if (value === null || value === undefined || value === '') return undefined; // Keep null, undefined, or empty strings
 
-    if (value.toLowerCase() === 'null') return null;
+    if (value.toLowerCase() === 'null') return undefined;
     if (value.toLowerCase() === 'undefined') return undefined;
+    if (value.toLowerCase() === 'nan') return undefined;
+    if (value.toLowerCase() === 'na') return undefined;
     if (value.toLowerCase() === 'true') return true;
     if (value.toLowerCase() === 'false') return false;
 

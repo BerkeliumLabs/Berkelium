@@ -24,7 +24,7 @@ describe('Read CSV file', () => {
         Name: 'Nimal Jayasinghe',
         City: 'Kandy',
         Age: 34,
-        'Monthly Income': '',
+        'Monthly Income': undefined,
         'Date of Birth': new Date('1990-03-22'),
       },
       {
@@ -37,7 +37,7 @@ describe('Read CSV file', () => {
       {
         Name: 'Sanduni Fernando',
         City: 'Galle',
-        Age: '',
+        Age: undefined,
         'Monthly Income': 70000,
         'Date of Birth': new Date('1994-02-15'),
       },
