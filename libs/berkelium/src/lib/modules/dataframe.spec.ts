@@ -36,4 +36,7 @@ describe('DataFrame', () => {
     it('Should display the count of non-null values in a column', () => {
         expect(df.count('Monthly Income')).toEqual(25);
     });
+    it('Should calculate the mean of a numeric column', () => {
+        expect(df.mean('Monthly Income')).toEqual(63480);
+    });
 });
