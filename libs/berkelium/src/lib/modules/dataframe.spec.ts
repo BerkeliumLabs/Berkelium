@@ -28,7 +28,7 @@ describe('DataFrame', () => {
         expect(df.shape()).toEqual([30, 5]);
     });
     it('Should display the column headers of the DataFrame', () => {
-        expect(df.columns()).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth']);
+        expect(df.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth']);
     });
     it('Should display the info of the DataFrame', () => {
         df.info();
@@ -78,5 +78,13 @@ describe('DataFrame', () => {
         df.fillna(0);
         // console.log(df.describe());
         expect(df.describe()).toBeTruthy();
+    });
+    it('Should get a specific column from the DataFrame', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(df.getColumn('Monthly Income')).toEqual(result.map((row: any) => row['Monthly Income']));
+    });
+    it('Should set values for a specific column in the DataFrame', () => {
+        df.setColumn('Monthly Income 2', new Array(30).fill(120));
+        expect(df.getColumn('Monthly Income 2')).toEqual(new Array(30).fill(120));
     });
 });
