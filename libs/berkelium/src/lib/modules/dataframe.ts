@@ -154,6 +154,19 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the maximum value of a numeric column.
+   * @param {string} column - The column name.
+   * @returns {number} - The maximum value.
+   */
+  max(column: string): number {
+    const values = this.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row[column])
+      .filter((val) => typeof val === 'number');
+    return Math.max(...values);
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {

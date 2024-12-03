@@ -49,4 +49,7 @@ describe('DataFrame', () => {
     it('Should calculate the minimum value of a numeric column', () => {
         expect(df.min('Monthly Income')).toEqual(40000);
     });
+    it('Should calculate the maximum value of a numeric column', () => {
+        expect(df.max('Monthly Income')).toEqual(91000);
+    });
 });
