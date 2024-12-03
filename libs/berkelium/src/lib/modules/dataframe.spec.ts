@@ -79,4 +79,8 @@ describe('DataFrame', () => {
         // console.log(df.describe());
         expect(df.describe()).toBeTruthy();
     });
+    it('Should get a specific column from the DataFrame', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(df.getColumn('Monthly Income')).toEqual(result.map((row: any) => row['Monthly Income']));
+    });
 });

@@ -52,6 +52,23 @@ export class DataFrame {
   }
 
   /**
+   * Gets all the data for a selected column.
+   * @param {string} columnName - The name of the column to retrieve.
+   * @returns {Array} - An array of values for the selected column.
+   * @throws {Error} - If the column does not exist.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getColumn(columnName: string): Array<any> {
+    if (!this.columns().includes(columnName)) {
+      throw new Error(
+        `Column "${columnName}" does not exist in the DataFrame.`
+      );
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.data.map((row: any) => row[columnName]);
+  }
+
+  /**
    * Displays a concise summary of the DataFrame.
    * The summary includes the number of rows and columns,
    * as well as the number of non-null values in each column and the data type of each column.
