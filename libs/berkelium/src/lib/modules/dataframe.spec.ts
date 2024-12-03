@@ -70,9 +70,13 @@ describe('DataFrame', () => {
     it('Should fill null values with a specified value', () => {
         df.fillna(0);
     });
+    it('Should drop rows with null values', () => {
+        df.dropna();
+        // df.print();
+    });
     it('Should display descriptive statistics for all numeric columns', () => {
         df.fillna(0);
-        console.log(df.describe());
+        // console.log(df.describe());
         expect(df.describe()).toBeTruthy();
     });
 });

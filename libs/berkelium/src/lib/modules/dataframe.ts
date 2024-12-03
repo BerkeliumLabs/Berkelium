@@ -213,6 +213,16 @@ export class DataFrame {
   }
 
   /**
+   * Removes rows with `undefined` values from the DataFrame.
+   * @returns {void}
+   */
+  dropna(): void {
+    this.data = this.data.filter((row) => {
+      return Object.values(row).every((value) => value != undefined);
+    });
+  }
+
+  /**
    * Returns summary statistics for all numeric columns in the DataFrame.
    * @returns {Object} - An object containing the summary statistics for numeric columns.
    */
