@@ -46,4 +46,7 @@ describe('DataFrame', () => {
     it('Should calculate the standard deviation of a numeric column', () => {
         expect(df.std('Monthly Income')).toEqual(15006.985040);
     });
+    it('Should calculate the minimum value of a numeric column', () => {
+        expect(df.min('Monthly Income')).toEqual(40000);
+    });
 });
