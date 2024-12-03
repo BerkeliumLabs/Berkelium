@@ -24,7 +24,10 @@ swcJestConfig.module = {
 // swcJestConfig.module.noInterop = false;
 
 export default {
-  displayName: 'berkelium',
+  displayName: {
+    name: 'Berkelium',
+    color: 'yellow',
+  },
   preset: '../../jest.preset.js',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
