@@ -59,13 +59,40 @@ export class DataFrame {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getColumn(columnName: string): Array<any> {
-    if (!this.columns().includes(columnName)) {
+    if (!this.headers.includes(columnName)) {
       throw new Error(
         `Column "${columnName}" does not exist in the DataFrame.`
       );
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.data.map((row: any) => row[columnName]);
+  }
+
+  /**
+   * Sets the data for a selected column. If the column does not exist, it adds the column.
+   * @param {string} columnName - The name of the column to set or update.
+   * @param {Array} values - An array of values to set in the column.
+   * @returns {void}
+   * @throws {Error} - If the length of values does not match the number of rows.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setColumn(columnName: string, values: Array<any>): void {
+    if (values.length !== this.data.length) {
+      throw new Error(
+        `Length of values (${values.length}) does not match number of rows (${this.data.length}).`
+      );
+    }
+
+    // Add the column if it doesn't exist
+    if (!this.headers.includes(columnName)) {
+      this.headers.push(columnName);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.data = this.data.map((row: any, index: number) => {
+      row[columnName] = values[index];
+      return row;
+    });
   }
 
   /**

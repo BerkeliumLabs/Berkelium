@@ -83,4 +83,8 @@ describe('DataFrame', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expect(df.getColumn('Monthly Income')).toEqual(result.map((row: any) => row['Monthly Income']));
     });
+    it('Should set values for a specific column in the DataFrame', () => {
+        df.setColumn('Monthly Income 2', new Array(30).fill(120));
+        expect(df.getColumn('Monthly Income 2')).toEqual(new Array(30).fill(120));
+    });
 });
