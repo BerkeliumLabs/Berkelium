@@ -167,6 +167,25 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the quartiles (25%, 50%, 75%) of a numeric column.
+   * @param {string} column - The column name.
+   * @returns {Object} - An object with 25%, 50%, and 75% quartile values.
+   */
+  quartiles(column: string): { '25%': number; '50%': number; '75%': number } {
+    const values = this.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row[column])
+      .filter((val) => typeof val === 'number');
+    values.sort((a, b) => a - b);
+
+    return {
+      '25%': this.getPercentile(0.25, values),
+      '50%': this.getPercentile(0.5, values),
+      '75%': this.getPercentile(0.75, values),
+    };
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {
@@ -198,5 +217,19 @@ export class DataFrame {
     }
 
     return true;
+  }
+
+  /**
+   * Calculates the value at the given percentile of the sorted array.
+   * This uses linear interpolation between the lower and upper values.
+   * @param {number} p - The percentile (between 0 and 1) to calculate.
+   * @param {number[]} values - The sorted array of values.
+   * @returns {number} - The value at the given percentile.
+   */
+  private getPercentile(p: number, values: number[]): number {
+    const index = p * (values.length - 1);
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    return values[lower] + (values[upper] - values[lower]) * (index - lower);
   }
 }

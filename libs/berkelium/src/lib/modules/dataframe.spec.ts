@@ -52,4 +52,7 @@ describe('DataFrame', () => {
     it('Should calculate the maximum value of a numeric column', () => {
         expect(df.max('Monthly Income')).toEqual(91000);
     });
+    it('Should calculate quartiles of a numeric column', () => {
+        expect(df.quartiles('Monthly Income')).toEqual({ '25%': 50000, '50%': 62000, '75%': 74000 });
+    });
 });
