@@ -186,6 +186,36 @@ export class DataFrame {
   }
 
   /**
+   * Returns summary statistics for all numeric columns in the DataFrame.
+   * @returns {Object} - An object containing the summary statistics for numeric columns.
+   */
+  describe() {
+    const summary: { [key: string]: DataSummary } = {};
+
+    // Filter numeric columns
+    const numericColumns = this.columns().filter((col: string) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.data.every((row: any) => typeof row[col] === 'number')
+    );
+
+    for (const col of numericColumns) {
+      summary[col] = {
+        count: this.count(col),
+        mean: this.mean(col),
+        std: this.std(col),
+        min: this.min(col),
+        '25%': this.quartiles(col)['25%'],
+        '50%': this.quartiles(col)['50%'],
+        '75%': this.quartiles(col)['75%'],
+        max: this.max(col),
+      };
+      console.log(summary[col]);
+    };
+
+    return summary;
+  }
+
+  /**
    * Prints the entire DataFrame to the console in a tabular format.
    */
   print(): void {
@@ -232,4 +262,15 @@ export class DataFrame {
     const upper = Math.ceil(index);
     return values[lower] + (values[upper] - values[lower]) * (index - lower);
   }
+}
+
+export interface DataSummary {
+  count: number;
+  mean: number;
+  std: number;
+  min: number;
+  '25%': number;
+  '50%': number;
+  '75%': number;
+  max: number;
 }
