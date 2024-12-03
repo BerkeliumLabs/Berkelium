@@ -82,6 +82,23 @@ export class DataFrame {
   }
 
   /**
+   * Selects specific columns from the DataFrame.
+   * @param {Array<string>} columnNames - List of column names to select.
+   * @returns {DataFrame} - A new DataFrame with the selected columns.
+   */
+  select(columnNames: Array<string>): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filteredData = this.data.map((row: any) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      columnNames.reduce((acc: any, col: any) => {
+        if (col in row) acc[col] = row[col];
+        return acc;
+      }, {})
+    );
+    return new DataFrame(filteredData);
+  }
+
+  /**
    * Calculates the count of non-null values in a column.
    * @param {string} column - The column name.
    * @returns {number} - Count of non-null values.
