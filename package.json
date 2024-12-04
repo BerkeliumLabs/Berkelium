@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "nx run @berkelium/berkelium:build",
-    "test": "nx run @berkelium/berkelium:test"
+    "test": "nx run @berkelium/berkelium:test",
+    "publish:core": "cd ./libs/berkelium/dist && npm publish --access public"
   },
   "private": true,
   "dependencies": {},
