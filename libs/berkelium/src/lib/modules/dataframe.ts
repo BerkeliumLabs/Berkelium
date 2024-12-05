@@ -39,7 +39,7 @@ export class DataFrame {
    * Returns an array with the number of rows and columns in the DataFrame.
    * @returns {[number, number]} - [number of rows, number of columns]
    */
-  shape(): [number, number] {
+  get shape(): [number, number] {
     return [this.data.length, this.headers.length];
   }
 
@@ -49,6 +49,15 @@ export class DataFrame {
    */
   get columns(): Array<string> {
     return this.headers;
+  }
+
+  /**
+   * Creates a shallow copy of the DataFrame.
+   * This is useful when you need to modify the DataFrame without changing the original.
+   * @returns {DataFrame} - A shallow copy of the DataFrame.
+   */
+  copy(): DataFrame {
+    return new DataFrame([...this.data]);
   }
 
   /**
@@ -152,6 +161,27 @@ export class DataFrame {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (row: any) => this.isNotEmpty(row[column])
     ).length;
+  }
+
+  /**
+   * Returns an array of objects, each representing the count of null values in a column.
+   * Each object contains the column name and the number of null values for that column.
+   * @returns {Array<object>} - An array of objects with column names and their null value counts.
+   */
+  isNull(): Array<object> {
+    const nullCounts: { [key: string]: number | string }[] = [];
+    this.headers.forEach((col: string) => {
+      const colNulls = this.data.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (row: any) => !this.isNotEmpty(row[col])
+      );
+      const count = {
+        Columns: col,
+        Count: colNulls.length,
+      };
+      nullCounts.push(count);
+    });
+    return nullCounts;
   }
 
   /**
