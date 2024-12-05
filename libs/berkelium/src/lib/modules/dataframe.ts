@@ -39,7 +39,7 @@ export class DataFrame {
    * Returns an array with the number of rows and columns in the DataFrame.
    * @returns {[number, number]} - [number of rows, number of columns]
    */
-  shape(): [number, number] {
+  get shape(): [number, number] {
     return [this.data.length, this.headers.length];
   }
 
