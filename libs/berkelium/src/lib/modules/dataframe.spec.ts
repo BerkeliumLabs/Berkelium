@@ -90,8 +90,8 @@ describe('DataFrame', () => {
     expect(df.describe()).toBeTruthy();
   });
   it('Should get a specific column from the DataFrame', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(df.getColumn('Monthly Income')).toEqual(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       result.map((row: any) => row['Monthly Income'])
     );
   });
@@ -105,11 +105,11 @@ describe('DataFrame', () => {
   it('Should display count of null values in each column', () => {
     // console.table(df.isNull());
     expect(df.isNull()).toEqual([
-        {"Columns": "Name", "Count": 3},
-        {"Columns": "City", "Count": 2},
-        {"Columns": "Age", "Count": 5},
-        {"Columns": "Monthly Income", "Count": 5},
-        {"Columns": "Date of Birth", "Count": 0},
+      { Columns: 'Name', Count: 3 },
+      { Columns: 'City', Count: 2 },
+      { Columns: 'Age', Count: 5 },
+      { Columns: 'Monthly Income', Count: 5 },
+      { Columns: 'Date of Birth', Count: 0 },
     ]);
   });
 });
