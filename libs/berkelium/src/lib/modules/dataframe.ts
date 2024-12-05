@@ -52,6 +52,15 @@ export class DataFrame {
   }
 
   /**
+   * Creates a shallow copy of the DataFrame.
+   * This is useful when you need to modify the DataFrame without changing the original.
+   * @returns {DataFrame} - A shallow copy of the DataFrame.
+   */
+  copy(): DataFrame {
+    return new DataFrame([...this.data]);
+  }
+
+  /**
    * Gets all the data for a selected column.
    * @param {string} columnName - The name of the column to retrieve.
    * @returns {Array} - An array of values for the selected column.

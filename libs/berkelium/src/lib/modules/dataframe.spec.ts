@@ -87,4 +87,7 @@ describe('DataFrame', () => {
         df.setColumn('Monthly Income 2', new Array(30).fill(120));
         expect(df.getColumn('Monthly Income 2')).toEqual(new Array(30).fill(120));
     });
+    it('Should copy the DataFrame', () => {
+        expect(df.copy()).toBeTruthy();
+    });
 });
