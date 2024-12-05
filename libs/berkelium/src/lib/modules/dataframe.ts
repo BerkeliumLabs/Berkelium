@@ -164,6 +164,27 @@ export class DataFrame {
   }
 
   /**
+   * Returns an array of objects, each representing the count of null values in a column.
+   * Each object contains the column name and the number of null values for that column.
+   * @returns {Array<object>} - An array of objects with column names and their null value counts.
+   */
+  isNull(): Array<object> {
+    const nullCounts: { [key: string]: number | string }[] = [];
+    this.headers.forEach((col: string) => {
+      const colNulls = this.data.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (row: any) => !this.isNotEmpty(row[col])
+      );
+      const count = {
+        Columns: col,
+        Count: colNulls.length,
+      };
+      nullCounts.push(count);
+    });
+    return nullCounts;
+  }
+
+  /**
    * Calculates the mean of a numeric column.
    * @param {string} column - The column name.
    * @returns {number} - The mean value.
