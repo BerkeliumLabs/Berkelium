@@ -105,12 +105,18 @@ export class DataFrame {
   }
 
   /**
-   * Displays a concise summary of the DataFrame.
-   * The summary includes the number of rows and columns,
-   * as well as the number of non-null values in each column and the data type of each column.
-   * The summary is printed to the console in a tabular format.
+   * Returns metadata information about the DataFrame.
+   * Provides details such as the total number of rows and columns,
+   * as well as a summary for each column that includes:
+   * - Index number
+   * - Column name
+   * - Count of non-null values
+   * - Data types present in the column
+   *
+   * @returns {object} An object containing DataFrame metadata,
+   * including total row and column count, along with column-specific information.
    */
-  info(): void {
+  info(): DataFrameInfo {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dfInfo: any = [];
     this.headers.forEach((col) => {
@@ -126,12 +132,14 @@ export class DataFrame {
       };
       dfInfo.push(infoRow);
     });
-    console.log(
-      `DataFrame Info:
-    Number of rows: ${this.data.length}
-    Number of columns: ${this.headers.length}\n`
-    );
-    console.table(dfInfo);
+
+    const dfInfoAll = {
+      rows: this.data.length,
+      columns: this.headers.length,
+      info: dfInfo,
+    };
+
+    return dfInfoAll;
   }
 
   /**
@@ -371,6 +379,17 @@ export class DataFrame {
     const lower = Math.floor(index);
     const upper = Math.ceil(index);
     return values[lower] + (values[upper] - values[lower]) * (index - lower);
+  }
+}
+
+export interface DataFrameInfo {
+  rows: number;
+  columns: number;
+  info: {
+    '#': number;
+    Column: string;
+    'Non-Null Count': number;
+    Dtype: string;
   }
 }
 

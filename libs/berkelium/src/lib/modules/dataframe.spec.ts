@@ -37,7 +37,13 @@ describe('DataFrame', () => {
     ]);
   });
   it('Should display the info of the DataFrame', () => {
-    df.info();
+    const dfInfo = df.info();
+    console.log(
+      `DataFrame Info:
+      Number of rows: ${dfInfo['rows']}
+      Number of columns: ${dfInfo['columns']}\n`
+    );
+    console.table(dfInfo.info);
   });
   it('Should display selected columns data from the DataFrame', () => {
     // df.select(['Name', 'Age']).print();
