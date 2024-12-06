@@ -334,10 +334,11 @@ export class DataFrame {
   }
 
   /**
-   * Prints the entire DataFrame to the console in a tabular format.
+   * Returns the entire dataset of the DataFrame.
+   * @returns {Array<Object>} - An array of objects representing all rows in the DataFrame.
    */
-  print(): void {
-    console.table(this.data);
+  print(): Array<object> {
+    return this.data;
   }
 
   /**
@@ -390,7 +391,7 @@ export interface DataFrameInfo {
     Column: string;
     'Non-Null Count': number;
     Dtype: string;
-  }
+  };
 }
 
 export interface DataSummary {
