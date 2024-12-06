@@ -176,20 +176,20 @@ export class DataFrame {
    * Each object contains the column name and the number of null values for that column.
    * @returns {Array<object>} - An array of objects with column names and their null value counts.
    */
-  isNull(): Array<object> {
-    const nullCounts: { [key: string]: number | string }[] = [];
-    this.headers.forEach((col: string) => {
-      const colNulls = this.data.filter(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (row: any) => !this.isNotEmpty(row[col])
-      );
-      const count = {
-        Columns: col,
-        Count: colNulls.length,
-      };
-      nullCounts.push(count);
+  isNull(): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nullCounts = this.data.map((row: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newRow: any = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Object.keys(row).forEach((key: any) => {
+        newRow[key] = this.isNotEmpty(row[key]);
+      });
+
+      return newRow;
     });
-    return nullCounts;
+    
+    return new DataFrame(nullCounts);
   }
 
   /**
