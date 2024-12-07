@@ -133,7 +133,7 @@ export class DataFrame {
       dfInfo.push(infoRow);
     });
 
-    const dfInfoAll = {
+    const dfInfoAll: DataFrameInfo = {
       rows: this.data.length,
       columns: this.headers.length,
       info: dfInfo,
