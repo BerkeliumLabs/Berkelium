@@ -14,7 +14,22 @@ export class DataFrame {
     this.data = data;
   }
 
+  /**
+   * Gets the column names of the DataFrame.
+   *
+   * @returns {string[]} - An array of strings containing the column names of the DataFrame.
+   */
   get columns(): string[] {
     return this.data.length > 0 ? Object.keys(this.data[0]) : [];
+  }
+
+  /**
+   * Gets the index labels of the DataFrame.
+   *
+   * @returns {number[]} - An array of numbers representing the index labels of the DataFrame.
+   * Each index represents the position of the row in the data.
+   */
+  get index(): number[] {
+    return Array.from({ length: this.data.length }, (_, i) => i);
   }
 }

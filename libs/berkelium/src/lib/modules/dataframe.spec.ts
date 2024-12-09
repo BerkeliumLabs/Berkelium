@@ -27,4 +27,9 @@ describe('DataFrame', () => {
       'Date of Birth',
     ]);
   });
+
+  test('should expose index correctly', () => {
+    const indices = Array.from({ length: result.length }, (_, i) => i);
+    expect(df.index).toEqual(indices);
+  });
 });
