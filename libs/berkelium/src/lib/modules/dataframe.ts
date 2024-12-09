@@ -32,4 +32,15 @@ export class DataFrame {
   get index(): number[] {
     return Array.from({ length: this.data.length }, (_, i) => i);
   }
+
+  /**
+   * Gets the shape of the DataFrame as a tuple of two numbers.
+   * The first number represents the number of rows and the second number
+   * represents the number of columns.
+   *
+   * @returns {[number, number]} - A tuple of two numbers representing the shape of the DataFrame.
+   */
+  get shape(): [number, number] {
+    return [this.data.length, this.columns.length];
+  }
 }
