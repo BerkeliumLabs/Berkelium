@@ -15,7 +15,16 @@ describe('DataFrame', () => {
   });
 
   it('Should create a DataFrame object', () => {
-    console.log(result);
     expect(df).toBeTruthy();
+  });
+
+  test('should initialize and expose columns', () => {
+    expect(df.columns).toEqual([
+      'Name',
+      'City',
+      'Age',
+      'Monthly Income',
+      'Date of Birth',
+    ]);
   });
 });
