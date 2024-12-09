@@ -3,7 +3,8 @@ import { DataReader } from './datareader';
 
 describe('Read CSV file', () => {
   let dataReader: DataReader;
-  let result: Array<object>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let result: Record<string, any[]>[];
 
   beforeEach(() => {
     dataReader = new DataReader();

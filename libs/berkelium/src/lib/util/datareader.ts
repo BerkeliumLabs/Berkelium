@@ -5,9 +5,10 @@ export class DataReader {
    *
    * @param {string} csvData - The CSV data as a string.
    * @param {string} [delimiter=','] - The delimiter used to separate values in the CSV data.
-   * @returns {Array<object>} An array of objects where each object corresponds to a row in the CSV data.
+   * @returns {Record<string, any>[]} An array of objects where each object corresponds to a row in the CSV data.
    */
-  readCSV(csvData: string, delimiter = ','): Array<object> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readCSV(csvData: string, delimiter = ','): Record<string, any>[] {
     // Split the data into rows
     const rows = csvData.trim().split('\n');
 
@@ -18,7 +19,7 @@ export class DataReader {
     const data = rows.slice(1).map((row) => {
       const values = row.split(delimiter).map((value) => value.trim());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return headers.reduce((obj: any, header: string, index: number) => {
+      return headers.reduce((obj: Record<string, any>, header: string, index: number) => {
         obj[header] = values[index];
         return obj;
       }, {});
@@ -32,14 +33,14 @@ export class DataReader {
   /**
    * Converts string values in the data to their appropriate data types.
    * Detects and transforms strings to number, boolean, null, undefined, Date, object, or other types.
-   * @param {Array<Object>} data - Array of objects representing the data.
-   * @returns {Array<Object>} - Transformed data with inferred types.
+   * @param {Record<string, any>[]} data - Array of objects representing the data.
+   * @returns {Record<string, any>[]} - Transformed data with inferred types.
    */
-  private transformDataTypes(data: string[]): Array<object> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data.map((row: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private transformDataTypes(data: Record<string, any>[]): Record<string, any>[] {
+    return data.map((row) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const transformedRow: { [key: string]: any } = {};
+      const transformedRow: Record<string, any> = {};
       Object.keys(row).forEach((key: string) => {
         transformedRow[key] = this.inferType(row[key]);
       });
@@ -56,12 +57,10 @@ export class DataReader {
   private inferType(value: string): any {
     if (value === null || value === undefined || value === '') return undefined; // Keep null, undefined, or empty strings
 
-    if (value.toLowerCase() === 'null') return undefined;
-    if (value.toLowerCase() === 'undefined') return undefined;
-    if (value.toLowerCase() === 'nan') return undefined;
-    if (value.toLowerCase() === 'na') return undefined;
-    if (value.toLowerCase() === 'true') return true;
-    if (value.toLowerCase() === 'false') return false;
+    const lowerValue = value.toLowerCase();
+    if (lowerValue === 'null' || lowerValue === 'undefined' || lowerValue === 'nan' || lowerValue === 'na') return undefined;
+    if (lowerValue === 'true') return true;
+    if (lowerValue === 'false') return false;
 
     // Try to parse as number
     if (!isNaN(Number(value))) return Number(value);
@@ -69,10 +68,7 @@ export class DataReader {
     // Try to parse as BigInt
     if (/^\d+n$/.test(value)) return BigInt(value.slice(0, -1));
 
-    // Try to parse as Date
-    /* const date = new Date(value);
-    if (!isNaN(date.getTime())) return date; */
-
+    // Try to parse as JSON
     try {
       const parsed = JSON.parse(value);
       if (typeof parsed === 'object') return parsed;
