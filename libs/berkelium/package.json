@@ -5,7 +5,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
   "browser": "./dist/index.umd.js",
-  "private": true,
   "nx": {
     "name": "berkelium"
   }
