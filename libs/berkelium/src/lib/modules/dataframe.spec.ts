@@ -39,11 +39,11 @@ describe('DataFrame', () => {
 
   test('should calculate dtypes correctly', () => {
     expect(df.dTypes).toEqual({
-      "Name": "string",
-      "City": "string",
-      "Age": "number",
-      "Monthly Income": "number",
-      "Date of Birth": "string"
+      Name: 'string',
+      City: 'string',
+      Age: 'number',
+      'Monthly Income': 'number',
+      'Date of Birth': 'string',
     });
   });
 
@@ -70,22 +70,16 @@ describe('DataFrame', () => {
     const info = df.info();
     expect(info).toEqual({
       shape: [30, 5],
-      columns: [
-        'Name',
-        'City',
-        'Age',
-        'Monthly Income',
-        'Date of Birth',
-      ],
+      columns: ['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth'],
       dTypes: {
-        "Name": "string",
-        "City": "string",
-        "Age": "number",
-        "Monthly Income": "number",
-        "Date of Birth": "string"
-      }
+        Name: 'string',
+        City: 'string',
+        Age: 'number',
+        'Monthly Income': 'number',
+        'Date of Birth': 'string',
+      },
     });
-    console.table(info.dTypes)
+    console.table(info.dTypes);
   });
 
   test('Should return minimum value of a column', () => {
@@ -114,8 +108,12 @@ describe('DataFrame', () => {
     expect(df.mean('Monthly Income')).toEqual(63480);
   });
 
-  it('Should calculate the standard deviation of a numeric column', () => {
+  test('Should calculate the standard deviation of a numeric column', () => {
     // expect(df.std('Monthly Income')).toEqual(15006.98504);
     expect(df.std('Monthly Income')).toBeCloseTo(15006.98504);
+  });
+
+  test('Should display the count of non-null values in a column', () => {
+    expect(df.count('Monthly Income')).toEqual(25);
   });
 });

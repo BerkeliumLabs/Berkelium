@@ -170,7 +170,9 @@ export class DataFrame {
    * @returns {number} - The mean value in the specified column.
    */
   mean(column: string): number {
-    const values = this.data.map((row) => row[column]).filter((v) => typeof v === 'number');
+    const values = this.data
+      .map((row) => row[column])
+      .filter((v) => typeof v === 'number');
     return values.reduce((acc, val) => acc + val, 0) / values.length;
   }
 
@@ -182,10 +184,25 @@ export class DataFrame {
    */
   std(column: string): number {
     const mean = this.mean(column);
-    const values = this.data.map((row) => row[column]).filter((v) => typeof v === 'number');
+    const values = this.data
+      .map((row) => row[column])
+      .filter((v) => typeof v === 'number');
     return Math.sqrt(
       values.reduce((acc, val) => acc + (val - mean) ** 2, 0) / values.length
     );
+  }
+
+  /**
+   * Counts the number of rows in the DataFrame that have a value in the given column.
+   *
+   * @param {string} column - The name of the column to count.
+   * @returns {number} - The number of rows in the DataFrame that have a value in the given column.
+   */
+  count(column: string): number {
+    return this.data.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (row: any) => this.isNotEmpty(row[column])
+    ).length;
   }
 
   /**
@@ -200,6 +217,42 @@ export class DataFrame {
     const lower = Math.floor(index);
     const upper = Math.ceil(index);
     return values[lower] + (values[upper] - values[lower]) * (index - lower);
+  }
+
+  /**
+   * Checks if a value is not empty.
+   *
+   * @param {any} value - The value to check.
+   * @returns {boolean} - `true` if the value is not empty, `false` otherwise.
+   *
+   * A value is considered empty if it is one of the following:
+   * - null
+   * - undefined
+   * - false
+   * - an empty string
+   * - NaN
+   * - an object with no keys
+   * - an array with no elements
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private isNotEmpty(value: any): boolean {
+    if (
+      value === null ||
+      value === undefined ||
+      value === false ||
+      value === '' ||
+      Number.isNaN(value)
+    ) {
+      return false;
+    }
+
+    if (typeof value === 'object') {
+      if (Object.keys(value).length === 0) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 
