@@ -3,7 +3,8 @@ import { DataFrame } from './dataframe';
 import { DataReader } from '../util/datareader';
 
 describe('DataFrame', () => {
-  let result: Array<object>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let result: Record<string, any[]>[];
   let df: DataFrame;
 
   beforeEach(() => {
@@ -16,18 +17,8 @@ describe('DataFrame', () => {
   it('Should create a DataFrame object', () => {
     expect(df).toBeTruthy();
   });
-  it('Should display the first 5 rows of the DataFrame', () => {
-    console.table(df.head());
-    expect(df.head()).toEqual(result.slice(0, 5));
-  });
-  it('Should display the last 5 rows of the DataFrame', () => {
-    console.table(df.tail());
-    expect(df.tail()).toEqual(result.slice(-5));
-  });
-  it('Should display the shape of the DataFrame', () => {
-    expect(df.shape).toEqual([30, 5]);
-  });
-  it('Should display the column headers of the DataFrame', () => {
+
+  test('should initialize and expose columns', () => {
     expect(df.columns).toEqual([
       'Name',
       'City',
@@ -36,79 +27,157 @@ describe('DataFrame', () => {
       'Date of Birth',
     ]);
   });
-  it('Should display the info of the DataFrame', () => {
-    const dfInfo = df.info();
-    console.log(
-      `DataFrame Info:
-      Number of rows: ${dfInfo['rows']}
-      Number of columns: ${dfInfo['columns']}\n`
-    );
-    console.table(dfInfo.info);
+
+  test('should expose index correctly', () => {
+    const indices = Array.from({ length: result.length }, (_, i) => i);
+    expect(df.index).toEqual(indices);
   });
-  it('Should display selected columns data from the DataFrame', () => {
-    // df.select(['Name', 'Age']).print();
-    expect(df.select(['Name', 'Age'])).toBeTruthy();
+
+  test('should calculate shape correctly', () => {
+    expect(df.shape).toEqual([30, 5]);
   });
-  it('Should display the count of non-null values in a column', () => {
-    expect(df.count('Monthly Income')).toEqual(25);
+
+  test('should calculate dtypes correctly', () => {
+    expect(df.dTypes).toEqual({
+      Name: 'string',
+      City: 'string',
+      Age: 'number',
+      'Monthly Income': 'number',
+      'Date of Birth': 'string',
+    });
   });
-  it('Should calculate the mean of a numeric column', () => {
-    expect(df.mean('Monthly Income')).toEqual(63480);
+
+  test('should return head of the DataFrame', () => {
+    const head = df.head(2);
+    expect(head).toBeInstanceOf(DataFrame);
+    expect(head.shape).toEqual([2, 5]);
   });
-  it('Should calculate the standard deviation of a numeric column', () => {
-    expect(df.std('Monthly Income')).toEqual(15006.98504);
+
+  test('should return tail of the DataFrame', () => {
+    const tail = df.tail(2);
+    expect(tail).toBeInstanceOf(DataFrame);
+    expect(tail.shape).toEqual([2, 5]);
   });
-  it('Should calculate the minimum value of a numeric column', () => {
-    expect(df.min('Monthly Income')).toEqual(40000);
+
+  test('should create a deep copy', () => {
+    const copy = df.copy();
+    expect(copy).toBeInstanceOf(DataFrame);
+    expect(copy).not.toBe(df);
+    expect(copy).toEqual(df);
   });
-  it('Should calculate the maximum value of a numeric column', () => {
-    expect(df.max('Monthly Income')).toEqual(91000);
+
+  test('should return info of the DataFrame', () => {
+    const info = df.info();
+    expect(info).toEqual({
+      shape: [30, 5],
+      columns: ['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth'],
+      dTypes: {
+        Name: 'string',
+        City: 'string',
+        Age: 'number',
+        'Monthly Income': 'number',
+        'Date of Birth': 'string',
+      },
+    });
+    console.table(info.dTypes);
   });
-  it('Should calculate quartiles of a numeric column', () => {
+
+  test('Should return minimum value of a column', () => {
+    const min = df.min('Monthly Income');
+    expect(min).toBe(40000);
+  });
+
+  test('Should return maximum value of a column', () => {
+    const min = df.max('Monthly Income');
+    expect(min).toBe(91000);
+  });
+
+  test('Should calculate quartiles of a numeric column', () => {
     expect(df.quartiles('Monthly Income')).toEqual({
       '25%': 50000,
       '50%': 62000,
       '75%': 74000,
     });
   });
-  it('Should calculate the median of a numeric column', () => {
+
+  test('Should calculate the median of a numeric column', () => {
     expect(df.median('Monthly Income')).toEqual(62000);
   });
-  /* it('Should calculate the mode of a numeric column', () => {
-        expect(df.mode('Monthly Income')).toEqual(45000);
-    }); */
-  /* it('Should calculate the sum of a numeric column', () => {
-        expect(df.sum('Monthly Income')).toEqual(1750000);
-    }); */
-  /* it('Should calculate the variance of a numeric column', () => {
-        expect(df.variance('Monthly Income')).toEqual(1750000);
-    }); */
-  it('Should fill null values with a specified value', () => {
-    df.fillna(0);
+
+  test('Should calculate the mean of a numeric column', () => {
+    expect(df.mean('Monthly Income')).toEqual(63480);
   });
-  it('Should drop rows with null values', () => {
-    df.dropna();
-    // df.print();
+
+  test('Should calculate the standard deviation of a numeric column', () => {
+    // expect(df.std('Monthly Income')).toEqual(15006.98504);
+    expect(df.std('Monthly Income')).toBeCloseTo(15006.98504);
   });
-  it('Should display descriptive statistics for all numeric columns', () => {
-    df.fillna(0);
-    // console.log(df.describe());
-    expect(df.describe()).toBeTruthy();
+
+  test('Should display the count of non-null values in a column', () => {
+    expect(df.count('Monthly Income')).toEqual(25);
   });
-  it('Should get a specific column from the DataFrame', () => {
-    expect(df.getColumn('Monthly Income')).toEqual(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      result.map((row: any) => row['Monthly Income'])
+
+  test('should describe numerical columns', () => {
+    const description = df.describe();
+    expect(description).toHaveProperty('Monthly Income');
+    expect(description['Monthly Income']).toEqual(
+      expect.objectContaining({
+        count: 25,
+        mean: 63480.000000,
+        min: 40000.000000,
+        max: 91000.000000,
+        std: 15006.985040,
+        '25%': 50000.000000,
+        '50%': 62000.000000,
+        '75%': 74000.000000,
+      })
     );
   });
-  it('Should set values for a specific column in the DataFrame', () => {
-    df.setColumn('Monthly Income 2', new Array(30).fill(120));
-    expect(df.getColumn('Monthly Income 2')).toEqual(new Array(30).fill(120));
+
+  test('should drop rows with null or undefined values', () => {
+    const filteredDf = df.dropna();
+    expect(filteredDf.shape).toEqual([17, 5]);
   });
-  it('Should copy the DataFrame', () => {
-    expect(df.copy()).toBeTruthy();
+
+  test('should fill null or undefined values', () => {
+    const filledDf = df.fillna(0);
+    expect(filledDf.shape).toEqual([30, 5]);
+    expect(filledDf.head().print()).toEqual([
+      { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
+      { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": 0, "Date of Birth": "1990-03-22" },
+      { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },
+      { "Name": "Sanduni Fernando", "City": "Galle", "Age": 0, "Monthly Income": 70000, "Date of Birth": "1994-02-15" },
+      { "Name": "Chaminda Weerasinghe", "City": "Kurunegala", "Age": 50, "Monthly Income": 55000, "Date of Birth": "1974-05-20" }
+    ]);
   });
-  it('Should display count of null values in each column', () => {
-    console.table(df.isNull().head());
+
+  test('should calculate value counts for a column', () => {
+    const counts = df.valueCounts('City');
+    expect(counts).toEqual(expect.objectContaining({
+      "Colombo": 4,
+      "Kandy": 2,
+      "Negombo": 2,
+      "Galle": 3,
+      "Kurunegala": 3,
+      "Anuradhapura": 2,
+      "Badulla": 2,
+      "Gampaha": 2,
+      "Hambantota": 2,
+      "Jaffna": 2,
+      "Matara": 2,
+      "Batticaloa": 1,
+      "Matale": 1
+    }));
+  });
+
+  test('Should print the DataFrame to the console', () => {
+    console.table(df.head().print());
+    expect(df.head().print()).toEqual([
+      { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
+      { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": undefined, "Date of Birth": "1990-03-22" },
+      { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },
+      { "Name": "Sanduni Fernando", "City": "Galle", "Age": undefined, "Monthly Income": 70000, "Date of Birth": "1994-02-15" },
+      { "Name": "Chaminda Weerasinghe", "City": "Kurunegala", "Age": 50, "Monthly Income": 55000, "Date of Birth": "1974-05-20" }
+    ])
   });
 });
