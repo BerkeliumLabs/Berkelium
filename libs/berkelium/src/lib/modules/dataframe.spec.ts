@@ -36,4 +36,14 @@ describe('DataFrame', () => {
   test('should calculate shape correctly', () => {
     expect(df.shape).toEqual([30, 5]);
   });
+
+  test('should calculate dtypes correctly', () => {
+    expect(df.dTypes).toEqual({
+      "Name": "string",
+      "City": "string",
+      "Age": "number",
+      "Monthly Income": "number",
+      "Date of Birth": "string"
+    });
+  });
 });

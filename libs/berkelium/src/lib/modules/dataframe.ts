@@ -43,4 +43,21 @@ export class DataFrame {
   get shape(): [number, number] {
     return [this.data.length, this.columns.length];
   }
+
+  /**
+   * Gets the data types of each column in the DataFrame.
+   *
+   * @returns {Record<string, DataType>} - An object mapping each column name to its data type.
+   * If the DataFrame is empty, returns an empty object.
+   */
+  get dTypes(): Record<string, DataType> {
+    if (this.data.length === 0) return {};
+
+    return this.columns.reduce((acc, col) => {
+      acc[col] = typeof this.data[0][col] as DataType;
+      return acc;
+    }, {} as Record<string, DataType>);
+  }
 }
+
+export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';
