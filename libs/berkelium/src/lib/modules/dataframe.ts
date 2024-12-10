@@ -164,6 +164,17 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the mean value of the specified column.
+   *
+   * @param {string} column - The name of the column to calculate the mean value for.
+   * @returns {number} - The mean value in the specified column.
+   */
+  mean(column: string): number {
+    const values = this.data.map((row) => row[column]).filter((v) => typeof v === 'number');
+    return values.reduce((acc, val) => acc + val, 0) / values.length;
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).

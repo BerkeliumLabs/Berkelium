@@ -109,4 +109,8 @@ describe('DataFrame', () => {
   test('Should calculate the median of a numeric column', () => {
     expect(df.median('Monthly Income')).toEqual(62000);
   });
+
+  test('Should calculate the mean of a numeric column', () => {
+    expect(df.mean('Monthly Income')).toEqual(63480);
+  });
 });
