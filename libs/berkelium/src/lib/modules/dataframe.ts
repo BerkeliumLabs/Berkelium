@@ -206,6 +206,44 @@ export class DataFrame {
   }
 
   /**
+   * Returns a summary of each numerical column in the DataFrame.
+   *
+   * For each numerical column, the returned object contains the following statistics:
+   * - `count`: The number of rows with a value in the column.
+   * - `mean`: The mean value of the column.
+   * - `std`: The standard deviation of the column.
+   * - `min`: The minimum value in the column.
+   * - `25%`: The 25th percentile of the column.
+   * - `50%`: The median (50th percentile) of the column.
+   * - `75%`: The 75th percentile of the column.
+   * - `max`: The maximum value in the column.
+   *
+   * @returns {Record<string, any>} - An object mapping each column to its summary statistics.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  describe(): Record<string, any> {
+    const numericalColumns = this.columns.filter((col) =>
+      this.data.some((row) => typeof row[col] === 'number')
+    );
+
+    return Object.fromEntries(
+      numericalColumns.map((col) => {
+        const stats = {
+          count: this.count(col),
+          mean: Number(this.mean(col).toFixed(6)),
+          std: Number(this.std(col).toFixed(6)),
+          min: Number(this.min(col).toFixed(6)),
+          '25%': Number(this.quartiles(col)['25%'].toFixed(6)),
+          '50%': Number(this.quartiles(col)['50%'].toFixed(6)),
+          '75%': Number(this.quartiles(col)['75%'].toFixed(6)),
+          max: Number(this.max(col).toFixed(6)),
+        };
+        return [col, stats];
+      })
+    );
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).

@@ -116,4 +116,21 @@ describe('DataFrame', () => {
   test('Should display the count of non-null values in a column', () => {
     expect(df.count('Monthly Income')).toEqual(25);
   });
+
+  test('should describe numerical columns', () => {
+    const description = df.describe();
+    expect(description).toHaveProperty('Monthly Income');
+    expect(description['Monthly Income']).toEqual(
+      expect.objectContaining({
+        count: 25,
+        mean: 63480.000000,
+        min: 40000.000000,
+        max: 91000.000000,
+        std: 15006.985040,
+        '25%': 50000.000000,
+        '50%': 62000.000000,
+        '75%': 74000.000000,
+      })
+    );
+  });
 });
