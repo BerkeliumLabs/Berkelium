@@ -154,6 +154,16 @@ export class DataFrame {
   }
 
   /**
+   * Returns the median value of the specified column.
+   *
+   * @param {string} column - The name of the column to find the median value in.
+   * @returns {number} - The median value in the specified column.
+   */
+  median(column: string): number {
+    return this.quartiles(column)['50%'];
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).
