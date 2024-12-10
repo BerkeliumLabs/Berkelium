@@ -278,6 +278,23 @@ export class DataFrame {
   }
 
   /**
+   * Counts the occurrences of each unique value in the specified column.
+   *
+   * @param {string} column - The name of the column to count unique values for.
+   * @returns {Record<any, number>} - An object mapping each unique value in the column
+   * to the number of times it appears in the DataFrame.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  valueCounts(column: string): Record<any, number> {
+    return this.data.reduce((acc, row) => {
+      const value = row[column];
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {} as Record<any, number>);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.

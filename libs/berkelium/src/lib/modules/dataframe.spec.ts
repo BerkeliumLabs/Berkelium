@@ -151,6 +151,25 @@ describe('DataFrame', () => {
     ]);
   });
 
+  test('should calculate value counts for a column', () => {
+    const counts = df.valueCounts('City');
+    expect(counts).toEqual(expect.objectContaining({
+      "Colombo": 4,
+      "Kandy": 2,
+      "Negombo": 2,
+      "Galle": 3,
+      "Kurunegala": 3,
+      "Anuradhapura": 2,
+      "Badulla": 2,
+      "Gampaha": 2,
+      "Hambantota": 2,
+      "Jaffna": 2,
+      "Matara": 2,
+      "Batticaloa": 1,
+      "Matale": 1
+    }));
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([
