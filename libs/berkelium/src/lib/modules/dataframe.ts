@@ -278,6 +278,18 @@ export class DataFrame {
   }
 
   /**
+   * Prints the DataFrame to the console.
+   *
+   * Returns the DataFrame data as an array of objects, which can be logged to the console.
+   *
+   * @returns {Record<string, any>[]} - The DataFrame data as an array of objects.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  print(): Record<string, any>[] {
+    return this.data;
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).
