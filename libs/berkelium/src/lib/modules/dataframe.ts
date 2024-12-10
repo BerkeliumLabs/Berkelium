@@ -78,6 +78,10 @@ export class DataFrame {
   tail(n = 5): DataFrame {
     return new DataFrame(this.data.slice(-n));
   }
+
+  copy(): DataFrame {
+    return new DataFrame(JSON.parse(JSON.stringify(this.data)));
+  }
 }
 
 export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';

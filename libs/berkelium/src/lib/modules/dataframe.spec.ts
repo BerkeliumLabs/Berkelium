@@ -58,4 +58,11 @@ describe('DataFrame', () => {
     expect(tail).toBeInstanceOf(DataFrame);
     expect(tail.shape).toEqual([2, 5]);
   });
+
+  test('should create a deep copy', () => {
+    const copy = df.copy();
+    expect(copy).toBeInstanceOf(DataFrame);
+    expect(copy).not.toBe(df);
+    expect(copy).toEqual(df);
+  });
 });
