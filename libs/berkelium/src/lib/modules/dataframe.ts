@@ -82,6 +82,28 @@ export class DataFrame {
   copy(): DataFrame {
     return new DataFrame(JSON.parse(JSON.stringify(this.data)));
   }
+
+  /**
+   * Returns an object containing information about the DataFrame.
+   *
+   * @returns { { shape: [number, number], columns: string[], dTypes: Record<string, DataType> } }
+   * An object with the following properties:
+   *  - `shape`: A tuple of two numbers representing the number of rows and columns in the DataFrame.
+   *  - `columns`: An array of strings representing the column labels of the DataFrame.
+   *  - `dTypes`: An object mapping each column name to its data type.
+   */
+  info(): {
+    shape: [number, number];
+    columns: string[];
+    dTypes: Record<string, DataType>;
+  } {
+    const info = {
+      shape: this.shape,
+      columns: this.columns,
+      dTypes: this.dTypes,
+    };
+    return info;
+  }
 }
 
 export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';

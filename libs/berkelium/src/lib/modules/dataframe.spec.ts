@@ -65,4 +65,26 @@ describe('DataFrame', () => {
     expect(copy).not.toBe(df);
     expect(copy).toEqual(df);
   });
+
+  test('should return info of the DataFrame', () => {
+    const info = df.info();
+    expect(info).toEqual({
+      shape: [30, 5],
+      columns: [
+        'Name',
+        'City',
+        'Age',
+        'Monthly Income',
+        'Date of Birth',
+      ],
+      dTypes: {
+        "Name": "string",
+        "City": "string",
+        "Age": "number",
+        "Monthly Income": "number",
+        "Date of Birth": "string"
+      }
+    });
+    console.table(info.dTypes)
+  })
 });
