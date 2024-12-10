@@ -52,4 +52,10 @@ describe('DataFrame', () => {
     expect(head).toBeInstanceOf(DataFrame);
     expect(head.shape).toEqual([2, 5]);
   });
+
+  test('should return tail of the DataFrame', () => {
+    const tail = df.tail(2);
+    expect(tail).toBeInstanceOf(DataFrame);
+    expect(tail.shape).toEqual([2, 5]);
+  });
 });

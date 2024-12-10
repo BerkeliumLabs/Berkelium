@@ -68,6 +68,16 @@ export class DataFrame {
   head(n = 5): DataFrame {
     return new DataFrame(this.data.slice(0, n));
   }
+
+  /**
+   * Gets the last n rows of the DataFrame.
+   *
+   * @param {number} [n=5] - The number of rows to return.
+   * @returns {DataFrame} - A new DataFrame containing the last n rows of the original DataFrame.
+   */
+  tail(n = 5): DataFrame {
+    return new DataFrame(this.data.slice(-n));
+  }
 }
 
 export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';
