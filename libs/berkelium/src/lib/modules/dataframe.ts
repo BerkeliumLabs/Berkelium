@@ -104,6 +104,14 @@ export class DataFrame {
     };
     return info;
   }
+
+  min(column: string): number {
+    const values = this.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row[column])
+      .filter((val) => typeof val === 'number');
+    return Math.min(...values);
+  }
 }
 
 export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';

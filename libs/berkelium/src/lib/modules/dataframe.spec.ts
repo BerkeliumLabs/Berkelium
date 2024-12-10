@@ -86,5 +86,10 @@ describe('DataFrame', () => {
       }
     });
     console.table(info.dTypes)
-  })
+  });
+
+  test('Should return minimum value of a column', () => {
+    const min = df.min('Monthly Income');
+    expect(min).toBe(40000);
+  });
 });
