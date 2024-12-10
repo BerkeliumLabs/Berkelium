@@ -92,4 +92,9 @@ describe('DataFrame', () => {
     const min = df.min('Monthly Income');
     expect(min).toBe(40000);
   });
+
+  test('Should return maximum value of a column', () => {
+    const min = df.max('Monthly Income');
+    expect(min).toBe(91000);
+  });
 });

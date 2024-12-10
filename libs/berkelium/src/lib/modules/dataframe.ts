@@ -105,12 +105,32 @@ export class DataFrame {
     return info;
   }
 
+  /**
+   * Returns the minimum value in the specified column.
+   *
+   * @param {string} column - The name of the column to find the minimum value in.
+   * @returns {number} - The minimum value in the specified column.
+   */
   min(column: string): number {
     const values = this.data
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((row: any) => row[column])
       .filter((val) => typeof val === 'number');
     return Math.min(...values);
+  }
+
+  /**
+   * Returns the maximum value in the specified column.
+   *
+   * @param {string} column - The name of the column to find the maximum value in.
+   * @returns {number} - The maximum value in the specified column.
+   */
+  max(column: string): number {
+    const values = this.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row[column])
+      .filter((val) => typeof val === 'number');
+    return Math.max(...values);
   }
 }
 
