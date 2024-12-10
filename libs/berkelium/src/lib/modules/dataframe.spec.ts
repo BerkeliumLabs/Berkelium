@@ -113,4 +113,9 @@ describe('DataFrame', () => {
   test('Should calculate the mean of a numeric column', () => {
     expect(df.mean('Monthly Income')).toEqual(63480);
   });
+
+  it('Should calculate the standard deviation of a numeric column', () => {
+    // expect(df.std('Monthly Income')).toEqual(15006.98504);
+    expect(df.std('Monthly Income')).toBeCloseTo(15006.98504);
+  });
 });

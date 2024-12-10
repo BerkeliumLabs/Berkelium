@@ -175,6 +175,20 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the standard deviation of the specified column.
+   *
+   * @param {string} column - The name of the column to calculate the standard deviation for.
+   * @returns {number} - The standard deviation of the column.
+   */
+  std(column: string): number {
+    const mean = this.mean(column);
+    const values = this.data.map((row) => row[column]).filter((v) => typeof v === 'number');
+    return Math.sqrt(
+      values.reduce((acc, val) => acc + (val - mean) ** 2, 0) / values.length
+    );
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).
