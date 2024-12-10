@@ -97,4 +97,12 @@ describe('DataFrame', () => {
     const min = df.max('Monthly Income');
     expect(min).toBe(91000);
   });
+
+  test('Should calculate quartiles of a numeric column', () => {
+    expect(df.quartiles('Monthly Income')).toEqual({
+      '25%': 50000,
+      '50%': 62000,
+      '75%': 74000,
+    });
+  });
 });

@@ -132,6 +132,40 @@ export class DataFrame {
       .filter((val) => typeof val === 'number');
     return Math.max(...values);
   }
+
+  /**
+   * Calculates the quartiles of the given column.
+   *
+   * @param {string} column - The name of the column to calculate the quartiles for.
+   * @returns {{ '25%': number, '50%': number, '75%': number }} An object containing the 25th, 50th, and 75th percentiles of the column.
+   */
+  quartiles(column: string): { '25%': number; '50%': number; '75%': number } {
+    const values = this.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row[column])
+      .filter((val) => typeof val === 'number');
+    values.sort((a, b) => a - b);
+
+    return {
+      '25%': this.getPercentile(0.25, values),
+      '50%': this.getPercentile(0.5, values),
+      '75%': this.getPercentile(0.75, values),
+    };
+  }
+
+  /**
+   * Calculates the percentile value from a sorted array of numbers.
+   *
+   * @param {number} p - The percentile to calculate (between 0 and 1).
+   * @param {number[]} values - A sorted array of numbers from which to calculate the percentile.
+   * @returns {number} - The calculated percentile value.
+   */
+  private getPercentile(p: number, values: number[]): number {
+    const index = p * (values.length - 1);
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    return values[lower] + (values[upper] - values[lower]) * (index - lower);
+  }
 }
 
 export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';
