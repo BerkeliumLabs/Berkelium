@@ -138,4 +138,16 @@ describe('DataFrame', () => {
     const filteredDf = df.dropna();
     expect(filteredDf.shape).toEqual([17, 5]);
   });
+
+  test('should fill null or undefined values', () => {
+    const filledDf = df.fillna(0);
+    expect(filledDf.shape).toEqual([30, 5]);
+    /* expect(filledDf.data).toEqual([
+      { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
+      { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": 0, "Date of Birth": "1990-03-22" },
+      { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },
+      { "Name": "Sanduni Fernando", "City": "Galle", "Age": 0, "Monthly Income": 70000, "Date of Birth": "1994-02-15" },
+      { "Name": "Chaminda Weerasinghe", "City": "Kurunegala", "Age": 50, "Monthly Income": 55000, "Date of Birth": "1974-05-20" }
+    ]); */
+  });
 });

@@ -257,6 +257,27 @@ export class DataFrame {
   }
 
   /**
+   * Replaces null or undefined values in the DataFrame with a given value.
+   *
+   * @param {any} value - The value to replace null or undefined values with.
+   * @returns {DataFrame} - A new DataFrame with null or undefined values replaced.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fillna(value: any): DataFrame {
+    const filledData = this.data.map((row) => {
+      const newRow = { ...row };
+      this.columns.forEach((col) => {
+        if (newRow[col] === null || newRow[col] === undefined) {
+          newRow[col] = value;
+        }
+      });
+      return newRow;
+    });
+
+    return new DataFrame(filledData);
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).
