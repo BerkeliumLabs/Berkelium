@@ -133,4 +133,9 @@ describe('DataFrame', () => {
       })
     );
   });
+
+  test('should drop rows with null or undefined values', () => {
+    const filteredDf = df.dropna();
+    expect(filteredDf.shape).toEqual([17, 5]);
+  });
 });

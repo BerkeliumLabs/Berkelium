@@ -244,6 +244,19 @@ export class DataFrame {
   }
 
   /**
+   * Removes rows from the DataFrame that contain undefined values in any column.
+   *
+   * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.
+   */
+  dropna(): DataFrame {
+    const filteredData = this.data.filter((row) =>
+      this.columns.every((col) => row[col] !== undefined)
+    );
+
+    return new DataFrame(filteredData);
+  }
+
+  /**
    * Calculates the percentile value from a sorted array of numbers.
    *
    * @param {number} p - The percentile to calculate (between 0 and 1).
