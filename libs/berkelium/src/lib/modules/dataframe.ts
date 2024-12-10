@@ -58,6 +58,16 @@ export class DataFrame {
       return acc;
     }, {} as Record<string, DataType>);
   }
+
+  /**
+   * Gets the first n rows of the DataFrame.
+   *
+   * @param {number} [n=5] - The number of rows to return.
+   * @returns {DataFrame} - A new DataFrame containing the first n rows of the original DataFrame.
+   */
+  head(n = 5): DataFrame {
+    return new DataFrame(this.data.slice(0, n));
+  }
 }
 
 export type DataType = 'number' | 'string' | 'boolean' | 'object' | 'undefined';

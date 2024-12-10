@@ -46,4 +46,10 @@ describe('DataFrame', () => {
       "Date of Birth": "string"
     });
   });
+
+  test('should return head of the DataFrame', () => {
+    const head = df.head(2);
+    expect(head).toBeInstanceOf(DataFrame);
+    expect(head.shape).toEqual([2, 5]);
+  });
 });
