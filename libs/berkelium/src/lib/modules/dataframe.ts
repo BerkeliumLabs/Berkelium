@@ -312,6 +312,20 @@ export class DataFrame {
   }
 
   /**
+   * Filters the DataFrame to only include rows that satisfy the given predicate.
+   *
+   * @param { (row: Record<string, any>) => boolean } predicate - A function that takes
+   * a row as an argument and returns a boolean indicating whether the row should be
+   * included in the filtered DataFrame.
+   * @returns {DataFrame} - A new DataFrame containing only the filtered rows.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filter(predicate: (row: Record<string, any>) => boolean): DataFrame {
+    const filteredData = this.data.filter(predicate);
+    return new DataFrame(filteredData);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
