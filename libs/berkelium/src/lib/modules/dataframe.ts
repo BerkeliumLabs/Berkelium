@@ -290,8 +290,61 @@ export class DataFrame {
       const value = row[column];
       acc[value] = (acc[value] || 0) + 1;
       return acc;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, {} as Record<any, number>);
+  }
+
+  /**
+   * Selects columns from the DataFrame that match the given data types.
+   *
+   * @param {DataType[]} types - The data types to select columns for.
+   * @returns {DataFrame} - A new DataFrame with columns filtered by the given data types.
+   */
+  selectDtypes(types: DataType[]): DataFrame {
+    const filteredColumns = this.columns.filter((col) =>
+      types.includes(this.dTypes[col])
+    );
+    const filteredData = this.data.map((row) =>
+      Object.fromEntries(filteredColumns.map((col) => [col, row[col]]))
+    );
+
+    return new DataFrame(filteredData);
+  }
+
+  /**
+   * Filters the DataFrame to only include rows that satisfy the given predicate.
+   *
+   * @param { (row: Record<string, any>) => boolean } predicate - A function that takes
+   * a row as an argument and returns a boolean indicating whether the row should be
+   * included in the filtered DataFrame.
+   * @returns {DataFrame} - A new DataFrame containing only the filtered rows.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filter(predicate: (row: Record<string, any>) => boolean): DataFrame {
+    const filteredData = this.data.filter(predicate);
+    return new DataFrame(filteredData);
+  }
+
+  /**
+   * Groups the DataFrame by the given column and returns a new object with the unique values
+   * of the column as keys and the corresponding DataFrames as values.
+   *
+   * @param {string} col - The column to group by.
+   * @returns {Record<string, DataFrame>} - A new object with the grouped DataFrames.
+   */
+  groupBy(col: string): Record<string, DataFrame> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groups: Record<string, Record<string, any>[]> = {};
+
+    this.data.forEach((row) => {
+      const key = row[col];
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(row);
+    });
+
+    return Object.fromEntries(
+      Object.entries(groups).map(([key, group]) => [key, new DataFrame(group)])
+    );
   }
 
   /**
