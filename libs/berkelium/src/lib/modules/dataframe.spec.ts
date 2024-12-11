@@ -180,6 +180,13 @@ describe('DataFrame', () => {
     expect(filteredDf.shape).toEqual([13, 5]);
   });
 
+  test('should group data by a column', () => {
+    const groups = df.groupBy('City');
+    expect(groups).toHaveProperty('Colombo');
+    expect(groups['Colombo']).toBeInstanceOf(DataFrame);
+    expect(groups['Colombo'].shape).toEqual([4, 5]);
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([

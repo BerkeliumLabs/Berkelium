@@ -326,6 +326,28 @@ export class DataFrame {
   }
 
   /**
+   * Groups the DataFrame by the given column and returns a new object with the unique values
+   * of the column as keys and the corresponding DataFrames as values.
+   *
+   * @param {string} col - The column to group by.
+   * @returns {Record<string, DataFrame>} - A new object with the grouped DataFrames.
+   */
+  groupBy(col: string): Record<string, DataFrame> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groups: Record<string, Record<string, any>[]> = {};
+
+    this.data.forEach((row) => {
+      const key = row[col];
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(row);
+    });
+
+    return Object.fromEntries(
+      Object.entries(groups).map(([key, group]) => [key, new DataFrame(group)])
+    );
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
