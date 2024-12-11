@@ -290,8 +290,25 @@ export class DataFrame {
       const value = row[column];
       acc[value] = (acc[value] || 0) + 1;
       return acc;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, {} as Record<any, number>);
+  }
+
+  /**
+   * Selects columns from the DataFrame that match the given data types.
+   *
+   * @param {DataType[]} types - The data types to select columns for.
+   * @returns {DataFrame} - A new DataFrame with columns filtered by the given data types.
+   */
+  selectDtypes(types: DataType[]): DataFrame {
+    const filteredColumns = this.columns.filter((col) =>
+      types.includes(this.dTypes[col])
+    );
+    const filteredData = this.data.map((row) =>
+      Object.fromEntries(filteredColumns.map((col) => [col, row[col]]))
+    );
+
+    return new DataFrame(filteredData);
   }
 
   /**

@@ -170,6 +170,11 @@ describe('DataFrame', () => {
     }));
   });
 
+  test('should select columns by dtypes', () => {
+    const selectedDf = df.selectDtypes(['number']);
+    expect(selectedDf.columns).toEqual(["Age", "Monthly Income"]);
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([
