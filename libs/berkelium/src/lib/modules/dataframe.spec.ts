@@ -187,6 +187,12 @@ describe('DataFrame', () => {
     expect(groups['Colombo'].shape).toEqual([4, 5]);
   });
 
+  it('Should display selected columns data from the DataFrame', () => {
+    const selectedDf = df.select(['Name', 'Age']);
+    expect(selectedDf).toBeInstanceOf(DataFrame);
+    expect(selectedDf.columns).toEqual(['Name', 'Age']);
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([

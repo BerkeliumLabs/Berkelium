@@ -348,6 +348,24 @@ export class DataFrame {
   }
 
   /**
+   * Selects columns from the DataFrame and returns a new DataFrame with the selected columns.
+   *
+   * @param {Array<string>} columnNames - An array of column names to select from the DataFrame.
+   * @returns {DataFrame} - A new DataFrame with the selected columns.
+   */
+  select(columnNames: Array<string>): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filteredData = this.data.map((row: any) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      columnNames.reduce((acc: any, col: any) => {
+        if (col in row) acc[col] = row[col];
+        return acc;
+      }, {})
+    );
+    return new DataFrame(filteredData);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
