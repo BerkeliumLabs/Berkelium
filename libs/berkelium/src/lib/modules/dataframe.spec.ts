@@ -187,10 +187,16 @@ describe('DataFrame', () => {
     expect(groups['Colombo'].shape).toEqual([4, 5]);
   });
 
-  it('Should display selected columns data from the DataFrame', () => {
+  test('Should display selected columns data from the DataFrame', () => {
     const selectedDf = df.select(['Name', 'Age']);
     expect(selectedDf).toBeInstanceOf(DataFrame);
     expect(selectedDf.columns).toEqual(['Name', 'Age']);
+  });
+
+  test('Should insert a new column into the DataFrame', () => {
+    const newDf = df.insert('Country', Array.from({ length: 30 }, () => 'Sri Lanka'));
+    // console.table(newDf.head().print());
+    expect(newDf.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth', 'Country']);
   });
 
   test('Should print the DataFrame to the console', () => {

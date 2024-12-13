@@ -366,6 +366,25 @@ export class DataFrame {
   }
 
   /**
+   * Inserts a new column into the DataFrame with the given data array.
+   *
+   * @param {string} column - The name of the column to be inserted.
+   * @param {any[]} dataArray - An array of data to populate the new column. The length of this array
+   * should match the number of rows in the DataFrame.
+   * @returns {DataFrame} - A new DataFrame with the inserted column.
+   */
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  insert(column: string, dataArray: any[]): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newData = this.data.map((row: any) => {
+      row[column] = dataArray.shift();
+      return row;
+    });
+    return new DataFrame(newData);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
