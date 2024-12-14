@@ -199,6 +199,13 @@ describe('DataFrame', () => {
     expect(newDf.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth', 'Country']);
   });
 
+  test('Should update a column in the DataFrame', () => {
+    const updatedDf = df.update('Age', Array.from({ length: 30 }, () => 25));
+    expect(updatedDf.select(['Age']).print()).toEqual(
+      Array.from({ length: 30 }, () => { return { "Age": 25 } })
+    );
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([
