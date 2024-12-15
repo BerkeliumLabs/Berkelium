@@ -403,6 +403,20 @@ export class DataFrame {
   }
 
   /**
+   * Deletes a column from the DataFrame.
+   *
+   * @param {string} column - The name of the column to be deleted.
+   * @returns {DataFrame} - A new DataFrame with the deleted column.
+   */
+  delete(column: string) {
+    const newData = this.data.map((row) => {
+      delete row[column];
+      return row;
+    });
+    return new DataFrame(newData);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.

@@ -206,6 +206,12 @@ describe('DataFrame', () => {
     );
   });
 
+  test('Should delete a column from the DataFrame', () => {
+    const deletedDf = df.delete('City');
+    expect(deletedDf).toBeInstanceOf(DataFrame);
+    expect(deletedDf.columns).toEqual(['Name', 'Age', 'Monthly Income', 'Date of Birth']);
+  })
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([
