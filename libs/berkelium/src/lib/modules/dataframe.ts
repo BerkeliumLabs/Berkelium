@@ -348,6 +348,75 @@ export class DataFrame {
   }
 
   /**
+   * Selects columns from the DataFrame and returns a new DataFrame with the selected columns.
+   *
+   * @param {Array<string>} columnNames - An array of column names to select from the DataFrame.
+   * @returns {DataFrame} - A new DataFrame with the selected columns.
+   */
+  select(columnNames: Array<string>): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filteredData = this.data.map((row: any) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      columnNames.reduce((acc: any, col: any) => {
+        if (col in row) acc[col] = row[col];
+        return acc;
+      }, {})
+    );
+    return new DataFrame(filteredData);
+  }
+
+  /**
+   * Inserts a new column into the DataFrame with the given data array.
+   *
+   * @param {string} column - The name of the column to be inserted.
+   * @param {any[]} dataArray - An array of data to populate the new column. The length of this array
+   * should match the number of rows in the DataFrame.
+   * @returns {DataFrame} - A new DataFrame with the inserted column.
+   */
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  insert(column: string, dataArray: any[]): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newData = this.data.map((row: any) => {
+      row[column] = dataArray.shift();
+      return row;
+    });
+    return new DataFrame(newData);
+  }
+
+  /**
+   * Updates a column in the DataFrame with the given data array.
+   *
+   * @param {string} column - The name of the column to be updated.
+   * @param {any[]} dataArray - An array of data to populate the column. The length of this array
+   * should match the number of rows in the DataFrame.
+   * @returns {DataFrame} - A new DataFrame with the updated column.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  update(column: string, dataArray: any[]): DataFrame {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newData = this.data.map((row: any) => {
+      row[column] = dataArray.shift();
+      return row;
+    });
+    return new DataFrame(newData);
+  }
+
+  /**
+   * Deletes a column from the DataFrame.
+   *
+   * @param {string} column - The name of the column to be deleted.
+   * @returns {DataFrame} - A new DataFrame with the deleted column.
+   */
+  delete(column: string) {
+    const newData = this.data.map((row) => {
+      delete row[column];
+      return row;
+    });
+    return new DataFrame(newData);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.

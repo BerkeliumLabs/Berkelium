@@ -187,6 +187,31 @@ describe('DataFrame', () => {
     expect(groups['Colombo'].shape).toEqual([4, 5]);
   });
 
+  test('Should display selected columns data from the DataFrame', () => {
+    const selectedDf = df.select(['Name', 'Age']);
+    expect(selectedDf).toBeInstanceOf(DataFrame);
+    expect(selectedDf.columns).toEqual(['Name', 'Age']);
+  });
+
+  test('Should insert a new column into the DataFrame', () => {
+    const newDf = df.insert('Country', Array.from({ length: 30 }, () => 'Sri Lanka'));
+    // console.table(newDf.head().print());
+    expect(newDf.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth', 'Country']);
+  });
+
+  test('Should update a column in the DataFrame', () => {
+    const updatedDf = df.update('Age', Array.from({ length: 30 }, () => 25));
+    expect(updatedDf.select(['Age']).print()).toEqual(
+      Array.from({ length: 30 }, () => { return { "Age": 25 } })
+    );
+  });
+
+  test('Should delete a column from the DataFrame', () => {
+    const deletedDf = df.delete('City');
+    expect(deletedDf).toBeInstanceOf(DataFrame);
+    expect(deletedDf.columns).toEqual(['Name', 'Age', 'Monthly Income', 'Date of Birth']);
+  })
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([
