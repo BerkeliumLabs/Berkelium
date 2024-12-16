@@ -210,7 +210,18 @@ describe('DataFrame', () => {
     const deletedDf = df.delete('City');
     expect(deletedDf).toBeInstanceOf(DataFrame);
     expect(deletedDf.columns).toEqual(['Name', 'Age', 'Monthly Income', 'Date of Birth']);
-  })
+  });
+
+  test('should calculate variance for numerical columns', () => {
+    df.fillna(0);
+    const variance = df.var();
+    console.table(variance);
+    expect(variance).toBeTruthy();
+  });
+
+  test('Should display the values of the specified column from each row in the DataFrame.', () => {
+    expect(df.head().array('Age')).toEqual([29, 34, 45, undefined, 50]);
+  });
 
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());

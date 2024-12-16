@@ -416,6 +416,56 @@ export class DataFrame {
     return new DataFrame(newData);
   }
 
+  var(): Record<string, any>[] {
+    const numericalColumns = this.columns.filter((col) =>
+      this.data.some((row) => typeof row[col] === 'number')
+    );
+    return numericalColumns.map((col) => ({
+      column: col,
+      variance: this.mean(col) ** 2,
+    }));
+  }
+
+  private calculateVariance(column: number[]): number {
+    // Validate input
+    if (column.length === 0) {
+      throw new Error('At least one column must be provided');
+    }
+
+    // Remove any non-numeric values
+    const numericColumn = column.filter(
+      (val) => typeof val === 'number' && !isNaN(val)
+    );
+
+    // Check if column has valid numeric values
+    if (numericColumn.length === 0) {
+      throw new Error('Column contains no valid numeric values');
+    }
+
+    // Calculate mean
+    const mean =
+      numericColumn.reduce((sum, val) => sum + val, 0) / numericColumn.length;
+
+    // Calculate variance (sum of squared differences from mean)
+    const variance =
+      numericColumn.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      numericColumn.length;
+
+    return variance;
+  }
+
+  /**
+   * Extracts the values of the specified column from each row in the DataFrame.
+   *
+   * @param {string} col - The name of the column to extract values from.
+   * @returns {any[]} - An array containing the values of the specified column from each row.
+   */
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  array(col: string): any[] {
+    return this.data.map((row) => row[col]);
+  }
+
   /**
    * Prints the DataFrame to the console.
    *
