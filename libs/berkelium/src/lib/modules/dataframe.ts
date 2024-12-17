@@ -417,6 +417,82 @@ export class DataFrame {
   }
 
   /**
+   * Calculates the variance of each numerical column in the DataFrame.
+   *
+   * @returns {Record<string, any>[]} - An array of objects, each containing the name of a
+   * numerical column and its variance.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  var(): Record<string, any>[] {
+    const numericalColumns = this.columns.filter((col) =>
+      this.data.some((row) => typeof row[col] === 'number')
+    );
+    return numericalColumns.map((col) => ({
+      column: col,
+      variance: this.calculateVariance(col),
+    }));
+  }
+
+  cov(): Record<string, any>[] {
+    const numericalColumns = this.columns.filter((col) => this.data.some((row) => typeof row[col] === 'number'));
+    const results: Record<string, any>[] = [];
+
+    for (const col1 of numericalColumns) {
+      const row: Record<string, any> = { column: col1 };
+      for (const col2 of numericalColumns) {
+        row[col2] = this.calculateCovariance(col1, col2);
+      }
+      results.push(row);
+    }
+
+    return results;
+  }
+
+  private calculateCovariance(col1: string, col2: string): number {
+    const values1 = this.array(col1);
+    const values2 = this.array(col2);
+    const mean1 = this.mean(col1);
+    const mean2 = this.mean(col2);
+
+    console.log(values1, values2);
+
+    return (
+      values1.reduce((acc, val, i) => acc + (val - mean1) * (values2[i] - mean2), 0) /
+      values1.length
+    );
+  }
+
+  /**
+   * Calculates the variance of the specified column.
+   *
+   * @param {string} column - The name of the column to calculate the variance for.
+   * @returns {number} - The variance of the column.
+   * @private
+   */
+  private calculateVariance(column: string): number {
+    const numericColumn = this.array(column);
+    const mean = this.mean(column);
+
+    const variance =
+      numericColumn.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      (numericColumn.length - 1);
+
+    return variance;
+  }
+
+  /**
+   * Extracts the values of the specified column from each row in the DataFrame.
+   *
+   * @param {string} col - The name of the column to extract values from.
+   * @returns {any[]} - An array containing the values of the specified column from each row.
+   */
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  array(col: string): any[] {
+    return this.data.map((row) => row[col]);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
