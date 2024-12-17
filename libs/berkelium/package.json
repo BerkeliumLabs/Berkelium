@@ -1,6 +1,6 @@
 {
   "name": "@berkelium/berkelium",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "dependencies": {},
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",

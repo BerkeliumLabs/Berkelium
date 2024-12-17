@@ -4,7 +4,7 @@
 
 # Berkelium
 
-This library was generated with [Nx](https://nx.dev).
+A lightweight JavaScript library for data analysis and manipulation.
 
 ## Building
 

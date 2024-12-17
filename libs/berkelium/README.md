@@ -3,4 +3,4 @@
 
 # Berkelium
 
-Project in progress
+A lightweight JavaScript library for data analysis and manipulation.
