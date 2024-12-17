@@ -213,10 +213,11 @@ describe('DataFrame', () => {
   });
 
   test('should calculate variance for numerical columns', () => {
-    df.fillna(0);
-    const variance = df.var();
-    console.table(variance);
-    expect(variance).toBeTruthy();
+    const df2 = df.selectDtypes(['number']).fillna(0);
+    const variance = df2.var();
+    // console.table(variance);
+    expect(variance[0]['variance']).toBeCloseTo(202.57931);
+    expect(variance[1]['variance']).toBeCloseTo(773127586.21);
   });
 
   test('Should display the values of the specified column from each row in the DataFrame.', () => {

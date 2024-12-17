@@ -416,40 +416,37 @@ export class DataFrame {
     return new DataFrame(newData);
   }
 
+  /**
+   * Calculates the variance of each numerical column in the DataFrame.
+   *
+   * @returns {Record<string, any>[]} - An array of objects, each containing the name of a
+   * numerical column and its variance.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var(): Record<string, any>[] {
     const numericalColumns = this.columns.filter((col) =>
       this.data.some((row) => typeof row[col] === 'number')
     );
     return numericalColumns.map((col) => ({
       column: col,
-      variance: this.mean(col) ** 2,
+      variance: this.calculateVariance(col),
     }));
   }
 
-  private calculateVariance(column: number[]): number {
-    // Validate input
-    if (column.length === 0) {
-      throw new Error('At least one column must be provided');
-    }
+  /**
+   * Calculates the variance of the specified column.
+   *
+   * @param {string} column - The name of the column to calculate the variance for.
+   * @returns {number} - The variance of the column.
+   * @private
+   */
+  private calculateVariance(column: string): number {
+    const numericColumn = this.array(column);
+    const mean = this.mean(column);
 
-    // Remove any non-numeric values
-    const numericColumn = column.filter(
-      (val) => typeof val === 'number' && !isNaN(val)
-    );
-
-    // Check if column has valid numeric values
-    if (numericColumn.length === 0) {
-      throw new Error('Column contains no valid numeric values');
-    }
-
-    // Calculate mean
-    const mean =
-      numericColumn.reduce((sum, val) => sum + val, 0) / numericColumn.length;
-
-    // Calculate variance (sum of squared differences from mean)
     const variance =
       numericColumn.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-      numericColumn.length;
+      (numericColumn.length - 1);
 
     return variance;
   }
