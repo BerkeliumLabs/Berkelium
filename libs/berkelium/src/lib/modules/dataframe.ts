@@ -433,7 +433,7 @@ export class DataFrame {
     }));
   }
 
-  cov(): Record<string, any>[] {
+  /* cov(): Record<string, any>[] {
     const numericalColumns = this.columns.filter((col) => this.data.some((row) => typeof row[col] === 'number'));
     const results: Record<string, any>[] = [];
 
@@ -460,7 +460,7 @@ export class DataFrame {
       values1.reduce((acc, val, i) => acc + (val - mean1) * (values2[i] - mean2), 0) /
       values1.length
     );
-  }
+  } */
 
   /**
    * Calculates the variance of the specified column.
