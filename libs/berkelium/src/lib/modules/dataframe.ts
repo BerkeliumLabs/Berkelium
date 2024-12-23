@@ -244,6 +244,16 @@ export class DataFrame {
   }
 
   /**
+   * Returns true if the specified column contains a null or undefined value in any row of the DataFrame.
+   *
+   * @param {string} column - The name of the column to check.
+   * @returns {boolean} - True if the column contains at least one null or undefined value, false otherwise.
+   */
+  isNull(column: string): boolean {
+    return this.data.some((row) => !this.isNotEmpty(row[column]));
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.

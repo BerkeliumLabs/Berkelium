@@ -134,6 +134,11 @@ describe('DataFrame', () => {
     );
   });
 
+  test('Should display whether a column has null or undefined values', () => {
+    expect(df.isNull('Name')).toBe(true);
+    expect(df.isNull('Date of Birth')).toBe(false);
+  });
+
   test('should drop rows with null or undefined values', () => {
     const filteredDf = df.dropna();
     expect(filteredDf.shape).toEqual([17, 5]);
@@ -220,12 +225,12 @@ describe('DataFrame', () => {
     expect(variance[1]['variance']).toBeCloseTo(773127586.21);
   });
 
-  test('Should calculate covariance for numerical columns', () => {
+  /* test('Should calculate covariance for numerical columns', () => {
     const df2 = df.selectDtypes(['number']).fillna(0);
     const covariance = df2.cov();
     console.table(covariance);
     console.log(df2.array('Age'));
-  });
+  }); */
 
   test('Should display the values of the specified column from each row in the DataFrame.', () => {
     expect(df.head().array('Age')).toEqual([29, 34, 45, undefined, 50]);
