@@ -254,6 +254,22 @@ export class DataFrame {
   }
 
   /**
+   * Renames a column in the DataFrame.
+   *
+   * @param {string} oldName - The current name of the column to rename.
+   * @param {string} newName - The new name for the column.
+   * @returns {void}
+   */
+  renameColumn(oldName: string, newName: string): void {
+    this.data = this.data.map((row) => {
+      const newRow = { ...row };
+      newRow[newName] = newRow[oldName];
+      delete newRow[oldName];
+      return newRow;
+    });
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.

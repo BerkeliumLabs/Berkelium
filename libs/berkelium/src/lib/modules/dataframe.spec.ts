@@ -139,6 +139,11 @@ describe('DataFrame', () => {
     expect(df.isNull('Date of Birth')).toBe(false);
   });
 
+  test('Should update a column name in the DataFrame', () => {
+    df.renameColumn('Date of Birth', 'dob')
+    expect(df.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'dob']);
+  });
+
   test('should drop rows with null or undefined values', () => {
     const filteredDf = df.dropna();
     expect(filteredDf.shape).toEqual([17, 5]);
