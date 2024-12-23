@@ -283,24 +283,30 @@ export class DataFrame {
   }
 
   /**
-   * Replaces null or undefined values in the DataFrame with a given value.
+   * Fills null or undefined values in the DataFrame with the specified value.
    *
-   * @param {any} value - The value to replace null or undefined values with.
-   * @returns {DataFrame} - A new DataFrame with null or undefined values replaced.
+   * If a column name is specified, only that column will be filled. Otherwise,
+   * all columns will be filled.
+   *
+   * @param {any} value - The value to fill null or undefined values with.
+   * @param {string} [column] - The column to fill, if only one column should be filled.
+   * @returns {DataFrame} - A new DataFrame with null or undefined values filled.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fillna(value: any): DataFrame {
-    const filledData = this.data.map((row) => {
+  fillna(value: any, column?: string): DataFrame {
+    const filteredData = this.data.map((row) => {
       const newRow = { ...row };
-      this.columns.forEach((col) => {
-        if (newRow[col] === null || newRow[col] === undefined) {
-          newRow[col] = value;
-        }
-      });
+      if (column) {
+        newRow[column] = row[column] ?? value;
+      } else {
+        Object.keys(row).forEach((key) => {
+          newRow[key] = row[key] ?? value;
+        });
+      }
       return newRow;
     });
 
-    return new DataFrame(filledData);
+    return new DataFrame(filteredData);
   }
 
   /**
