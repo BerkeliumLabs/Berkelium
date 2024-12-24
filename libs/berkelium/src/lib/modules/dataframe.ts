@@ -90,6 +90,17 @@ export class DataFrame {
   }
 
   /**
+   * Updates the value of a specific element in the DataFrame at the specified index and column.
+   * @param {number} index - The index of the row to update.
+   * @param {string} column - The name of the column to update.
+   * @param {any} value - The new value to assign to the element.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateElement(index: number, column: string, value: any): void {
+    this.data[index][column] = value;
+  }
+
+  /**
    * Gets the first n rows of the DataFrame.
    *
    * @param {number} [n=5] - The number of rows to return.

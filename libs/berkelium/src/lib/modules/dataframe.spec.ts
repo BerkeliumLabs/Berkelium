@@ -93,6 +93,12 @@ describe('DataFrame', () => {
     expect(wrongTypeRows.length).toBe(5);
   });
 
+  test('Should update an element in the DataFrame', () => {
+    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
+    df.updateElement(wrongTypeRows[0]['index'], 'Monthly Income', 45000);
+    expect(df.head(1).array('Monthly Income')).toEqual([45000]);
+  });
+
   test('Should return minimum value of a column', () => {
     const min = df.min('Monthly Income');
     expect(min).toBe(40000);
