@@ -93,6 +93,12 @@ describe('DataFrame', () => {
     expect(wrongTypeRows.length).toBe(5);
   });
 
+  test('Should remove rows with wrong data type', () => {
+    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
+    df.deleteObservations(wrongTypeRows.map((row) => row['index']));
+    expect(df.shape).toEqual([25, 5]);
+  });
+
   test('Should update an element in the DataFrame', () => {
     const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
     df.updateElement(wrongTypeRows[0]['index'], 'Monthly Income', 45000);

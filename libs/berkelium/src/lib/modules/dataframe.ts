@@ -101,6 +101,15 @@ export class DataFrame {
   }
 
   /**
+   * Deletes the specified rows from the DataFrame.
+   *
+   * @param {number[]} indices - An array of indices of the rows to delete.
+   */
+  deleteObservations(indices: number[]): void {
+    this.data = this.data.filter((_, index) => !indices.includes(index));
+  }
+
+  /**
    * Gets the first n rows of the DataFrame.
    *
    * @param {number} [n=5] - The number of rows to return.
