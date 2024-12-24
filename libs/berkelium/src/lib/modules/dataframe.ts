@@ -312,11 +312,38 @@ export class DataFrame {
    */
   renameColumn(oldName: string, newName: string): void {
     this.data = this.data.map((row) => {
-      const newRow = { ...row };
-      newRow[newName] = newRow[oldName];
-      delete newRow[oldName];
-      return newRow;
+      const newRow = Object.entries(row).map(([key, value]) => {
+        if (key === oldName) {
+          return [newName, value];
+        }
+        return [key, value];
+      });
+      return Object.fromEntries(newRow);
     });
+  }
+
+  /**
+   * Checks if the DataFrame contains any undefined values in any column.
+   *
+   * @returns {boolean} - True if the DataFrame contains at least one undefined value, false otherwise.
+   */
+  hasUndefined(): boolean {
+    return this.data.some((row) =>
+      Object.values(row).some((value) => value === undefined)
+    );
+  }
+
+  /**
+   * Checks if the DataFrame contains any rows where the type of a value does not match the type of its column.
+   *
+   * @returns {boolean} - True if the DataFrame contains at least one row with a value of the wrong type, false otherwise.
+   */
+  hasWrongDataTypes(): boolean {
+    return this.data.some((row) =>
+      Object.keys(row).some(
+        (column) => typeof row[column] !== this.dTypes[column]
+      )
+    );
   }
 
   /**

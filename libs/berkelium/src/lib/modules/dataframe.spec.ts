@@ -163,8 +163,19 @@ describe('DataFrame', () => {
   });
 
   test('Should update a column name in the DataFrame', () => {
-    df.renameColumn('Date of Birth', 'dob')
-    expect(df.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'dob']);
+    df.renameColumn('Date of Birth', 'dob');
+    df.renameColumn('Monthly Income', 'mon_inc');
+    expect(df.columns).toEqual(['Name', 'City', 'Age', 'mon_inc', 'dob']);
+  });
+
+  test('Should display if the DataFrame has undefined values', () => {
+    expect(df.hasUndefined()).toBe(true);
+  });
+
+  test('Should display if the DataFrame has values with wrong data type', () => {
+    df.updateElement(0, 'Monthly Income', '45000');
+    const df2 = df.dropna();
+    expect(df2.hasWrongDataTypes()).toBe(true);
   });
 
   test('should drop rows with null or undefined values', () => {
