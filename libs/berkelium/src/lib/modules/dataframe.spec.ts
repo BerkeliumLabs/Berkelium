@@ -168,6 +168,10 @@ describe('DataFrame', () => {
     expect(df.columns).toEqual(['Name', 'City', 'Age', 'mon_inc', 'dob']);
   });
 
+  test('Should display if the DataFrame has undefined values', () => {
+    expect(df.hasUndefined()).toBe(true);
+  });
+
   test('should drop rows with null or undefined values', () => {
     const filteredDf = df.dropna();
     expect(filteredDf.shape).toEqual([17, 5]);

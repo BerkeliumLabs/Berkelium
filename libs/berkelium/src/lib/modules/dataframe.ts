@@ -323,6 +323,17 @@ export class DataFrame {
   }
 
   /**
+   * Checks if the DataFrame contains any undefined values in any column.
+   *
+   * @returns {boolean} - True if the DataFrame contains at least one undefined value, false otherwise.
+   */
+  hasUndefined(): boolean {
+    return this.data.some((row) =>
+      Object.values(row).some((value) => value === undefined)
+    );
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.
