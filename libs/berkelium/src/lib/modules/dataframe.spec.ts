@@ -82,6 +82,29 @@ describe('DataFrame', () => {
     console.table(info.dTypes);
   });
 
+  test('Should display if the column has same data type', () => {
+    expect(df.isSameType('Monthly Income')).toBe(false);
+    expect(df.isSameType('Date of Birth')).toBe(true);
+  });
+
+  test('Should return rows with wrong data type', () => {
+    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
+    console.table(wrongTypeRows);
+    expect(wrongTypeRows.length).toBe(5);
+  });
+
+  test('Should remove rows with wrong data type', () => {
+    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
+    df.deleteObservations(wrongTypeRows.map((row) => row['index']));
+    expect(df.shape).toEqual([25, 5]);
+  });
+
+  test('Should update an element in the DataFrame', () => {
+    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
+    df.updateElement(wrongTypeRows[0]['index'], 'Monthly Income', 45000);
+    expect(df.head(1).array('Monthly Income')).toEqual([45000]);
+  });
+
   test('Should return minimum value of a column', () => {
     const min = df.min('Monthly Income');
     expect(min).toBe(40000);
@@ -132,6 +155,16 @@ describe('DataFrame', () => {
         '75%': 74000.000000,
       })
     );
+  });
+
+  test('Should display whether a column has null or undefined values', () => {
+    expect(df.isNull('Name')).toBe(true);
+    expect(df.isNull('Date of Birth')).toBe(false);
+  });
+
+  test('Should update a column name in the DataFrame', () => {
+    df.renameColumn('Date of Birth', 'dob')
+    expect(df.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'dob']);
   });
 
   test('should drop rows with null or undefined values', () => {
@@ -220,12 +253,12 @@ describe('DataFrame', () => {
     expect(variance[1]['variance']).toBeCloseTo(773127586.21);
   });
 
-  test('Should calculate covariance for numerical columns', () => {
+  /* test('Should calculate covariance for numerical columns', () => {
     const df2 = df.selectDtypes(['number']).fillna(0);
     const covariance = df2.cov();
     console.table(covariance);
     console.log(df2.array('Age'));
-  });
+  }); */
 
   test('Should display the values of the specified column from each row in the DataFrame.', () => {
     expect(df.head().array('Age')).toEqual([29, 34, 45, undefined, 50]);

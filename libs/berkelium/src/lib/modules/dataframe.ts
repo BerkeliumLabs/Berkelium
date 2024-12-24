@@ -60,6 +60,56 @@ export class DataFrame {
   }
 
   /**
+   * Checks if all values in the specified column have the same data type.
+   *
+   * @param {string} column - The name of the column to check.
+   * @returns {boolean} - `true` if all values in the column have the same data type as the column's data type; `false` otherwise.
+   */
+  isSameType(column: string): boolean {
+    return this.data.every((row) => typeof row[column] === this.dTypes[column]);
+  }
+
+  /**
+   * Returns an array of objects representing the rows that have a different data type than the data type of the specified column.
+   * Each object contains the original row data with an additional "index" property set to the index of the row in the original DataFrame.
+   * If no rows have a different data type, an empty array is returned.
+   * @param {string} column - The name of the column to check.
+   * @returns {Record<string, any>[]} - An array of objects representing the rows with a different data type.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getWrongTypeRows(column: string): Record<string, any>[] {
+    return this.data
+      .map((row, index) => {
+        if (typeof row[column] !== this.dTypes[column]) {
+          row['index'] = index;
+          return row;
+        }
+        return null;
+      })
+      .filter((row) => row !== null);
+  }
+
+  /**
+   * Updates the value of a specific element in the DataFrame at the specified index and column.
+   * @param {number} index - The index of the row to update.
+   * @param {string} column - The name of the column to update.
+   * @param {any} value - The new value to assign to the element.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateElement(index: number, column: string, value: any): void {
+    this.data[index][column] = value;
+  }
+
+  /**
+   * Deletes the specified rows from the DataFrame.
+   *
+   * @param {number[]} indices - An array of indices of the rows to delete.
+   */
+  deleteObservations(indices: number[]): void {
+    this.data = this.data.filter((_, index) => !indices.includes(index));
+  }
+
+  /**
    * Gets the first n rows of the DataFrame.
    *
    * @param {number} [n=5] - The number of rows to return.
@@ -244,6 +294,32 @@ export class DataFrame {
   }
 
   /**
+   * Returns true if the specified column contains a null or undefined value in any row of the DataFrame.
+   *
+   * @param {string} column - The name of the column to check.
+   * @returns {boolean} - True if the column contains at least one null or undefined value, false otherwise.
+   */
+  isNull(column: string): boolean {
+    return this.data.some((row) => !this.isNotEmpty(row[column]));
+  }
+
+  /**
+   * Renames a column in the DataFrame.
+   *
+   * @param {string} oldName - The current name of the column to rename.
+   * @param {string} newName - The new name for the column.
+   * @returns {void}
+   */
+  renameColumn(oldName: string, newName: string): void {
+    this.data = this.data.map((row) => {
+      const newRow = { ...row };
+      newRow[newName] = newRow[oldName];
+      delete newRow[oldName];
+      return newRow;
+    });
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.
@@ -257,24 +333,30 @@ export class DataFrame {
   }
 
   /**
-   * Replaces null or undefined values in the DataFrame with a given value.
+   * Fills null or undefined values in the DataFrame with the specified value.
    *
-   * @param {any} value - The value to replace null or undefined values with.
-   * @returns {DataFrame} - A new DataFrame with null or undefined values replaced.
+   * If a column name is specified, only that column will be filled. Otherwise,
+   * all columns will be filled.
+   *
+   * @param {any} value - The value to fill null or undefined values with.
+   * @param {string} [column] - The column to fill, if only one column should be filled.
+   * @returns {DataFrame} - A new DataFrame with null or undefined values filled.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fillna(value: any): DataFrame {
-    const filledData = this.data.map((row) => {
+  fillna(value: any, column?: string): DataFrame {
+    const filteredData = this.data.map((row) => {
       const newRow = { ...row };
-      this.columns.forEach((col) => {
-        if (newRow[col] === null || newRow[col] === undefined) {
-          newRow[col] = value;
-        }
-      });
+      if (column) {
+        newRow[column] = row[column] ?? value;
+      } else {
+        Object.keys(row).forEach((key) => {
+          newRow[key] = row[key] ?? value;
+        });
+      }
       return newRow;
     });
 
-    return new DataFrame(filledData);
+    return new DataFrame(filteredData);
   }
 
   /**
