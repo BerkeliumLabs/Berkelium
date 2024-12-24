@@ -5,11 +5,3 @@
 # Berkelium
 
 A lightweight JavaScript library for data analysis and manipulation.
-
-## Building
-
-Run `npm run build` to build the library.
-
-## Running unit tests
-
-Run `npm test` to execute the unit tests via [Jest](https://jestjs.io).
