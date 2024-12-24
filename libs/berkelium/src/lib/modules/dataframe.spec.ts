@@ -82,6 +82,11 @@ describe('DataFrame', () => {
     console.table(info.dTypes);
   });
 
+  test('Should display if the column has same data type', () => {
+    expect(df.isSameType('Monthly Income')).toBe(false);
+    expect(df.isSameType('Date of Birth')).toBe(true);
+  });
+
   test('Should return minimum value of a column', () => {
     const min = df.min('Monthly Income');
     expect(min).toBe(40000);

@@ -59,6 +59,10 @@ export class DataFrame {
     }, {} as Record<string, DataType>);
   }
 
+  isSameType(column: string): boolean {
+    return this.data.every((row) => typeof row[column] === this.dTypes[column]);
+  }
+
   /**
    * Gets the first n rows of the DataFrame.
    *
