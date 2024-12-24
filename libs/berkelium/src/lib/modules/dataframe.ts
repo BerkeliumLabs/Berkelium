@@ -334,6 +334,19 @@ export class DataFrame {
   }
 
   /**
+   * Checks if the DataFrame contains any rows where the type of a value does not match the type of its column.
+   *
+   * @returns {boolean} - True if the DataFrame contains at least one row with a value of the wrong type, false otherwise.
+   */
+  hasWrongDataTypes(): boolean {
+    return this.data.some((row) =>
+      Object.keys(row).some(
+        (column) => typeof row[column] !== this.dTypes[column]
+      )
+    );
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.
