@@ -87,6 +87,12 @@ describe('DataFrame', () => {
     expect(df.isSameType('Date of Birth')).toBe(true);
   });
 
+  test('Should return rows with wrong data type', () => {
+    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
+    console.table(wrongTypeRows);
+    expect(wrongTypeRows.length).toBe(5);
+  });
+
   test('Should return minimum value of a column', () => {
     const min = df.min('Monthly Income');
     expect(min).toBe(40000);

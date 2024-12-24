@@ -59,8 +59,34 @@ export class DataFrame {
     }, {} as Record<string, DataType>);
   }
 
+  /**
+   * Checks if all values in the specified column have the same data type.
+   *
+   * @param {string} column - The name of the column to check.
+   * @returns {boolean} - `true` if all values in the column have the same data type as the column's data type; `false` otherwise.
+   */
   isSameType(column: string): boolean {
     return this.data.every((row) => typeof row[column] === this.dTypes[column]);
+  }
+
+  /**
+   * Returns an array of objects representing the rows that have a different data type than the data type of the specified column.
+   * Each object contains the original row data with an additional "index" property set to the index of the row in the original DataFrame.
+   * If no rows have a different data type, an empty array is returned.
+   * @param {string} column - The name of the column to check.
+   * @returns {Record<string, any>[]} - An array of objects representing the rows with a different data type.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getWrongTypeRows(column: string): Record<string, any>[] {
+    return this.data
+      .map((row, index) => {
+        if (typeof row[column] !== this.dTypes[column]) {
+          row['index'] = index;
+          return row;
+        }
+        return null;
+      })
+      .filter((row) => row !== null);
   }
 
   /**
