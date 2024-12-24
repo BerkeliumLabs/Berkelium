@@ -163,8 +163,9 @@ describe('DataFrame', () => {
   });
 
   test('Should update a column name in the DataFrame', () => {
-    df.renameColumn('Date of Birth', 'dob')
-    expect(df.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'dob']);
+    df.renameColumn('Date of Birth', 'dob');
+    df.renameColumn('Monthly Income', 'mon_inc');
+    expect(df.columns).toEqual(['Name', 'City', 'Age', 'mon_inc', 'dob']);
   });
 
   test('should drop rows with null or undefined values', () => {

@@ -312,10 +312,13 @@ export class DataFrame {
    */
   renameColumn(oldName: string, newName: string): void {
     this.data = this.data.map((row) => {
-      const newRow = { ...row };
-      newRow[newName] = newRow[oldName];
-      delete newRow[oldName];
-      return newRow;
+      const newRow = Object.entries(row).map(([key, value]) => {
+        if (key === oldName) {
+          return [newName, value];
+        }
+        return [key, value];
+      });
+      return Object.fromEntries(newRow);
     });
   }
 
