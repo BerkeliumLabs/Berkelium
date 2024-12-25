@@ -347,6 +347,18 @@ export class DataFrame {
   }
 
   /**
+   * Checks if the DataFrame contains any duplicate rows.
+   *
+   * @returns {boolean} - True if the DataFrame contains duplicate rows, false otherwise.
+   */
+  hasDuplicates(): boolean {
+    return (
+      this.data.length !==
+      new Set(this.data.map((row) => JSON.stringify(row))).size
+    );
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.

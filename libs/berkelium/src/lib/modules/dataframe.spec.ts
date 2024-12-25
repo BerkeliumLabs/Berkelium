@@ -172,6 +172,10 @@ describe('DataFrame', () => {
     expect(df.hasUndefined()).toBe(true);
   });
 
+  test('Should display whether the DataFrame has duplicate rows', () => {
+    expect(df.hasDuplicates()).toBe(false);
+  });
+
   test('Should display if the DataFrame has values with wrong data type', () => {
     df.updateElement(0, 'Monthly Income', '45000');
     const df2 = df.dropna();
