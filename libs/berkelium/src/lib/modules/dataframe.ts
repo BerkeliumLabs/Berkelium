@@ -54,7 +54,7 @@ export class DataFrame {
     if (this.data.length === 0) return {};
 
     return this.columns.reduce((acc, col) => {
-      acc[col] = typeof this.data[0][col] as DataType;
+      acc[col] = this.mostFrequentType(this.array(col));
       return acc;
     }, {} as Record<string, DataType>);
   }
@@ -635,6 +635,37 @@ export class DataFrame {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   print(): Record<string, any>[] {
     return this.data;
+  }
+
+  /**
+   * Determines the most frequent data type in the given array.
+   *
+   * @param {any[]} arr - An array of values to analyze.
+   * @returns {DataType} - The data type that appears most frequently in the array.
+   * If multiple data types have the same frequency, one of them is returned.
+   * Excludes 'undefined' types from consideration.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mostFrequentType(arr: any[]): DataType {
+    const frequencyMap = new Map();
+    let maxCount = 0;
+    let mostFrequentType = undefined;
+
+    for (const item of arr) {
+      const value = typeof item as DataType;
+
+      if (value !== 'undefined') {
+        const count = (frequencyMap.get(value) || 0) + 1;
+        frequencyMap.set(value, count);
+
+        if (count > maxCount) {
+          maxCount = count;
+          mostFrequentType = value;
+        }
+      }
+    }
+
+    return mostFrequentType as DataType;
   }
 
   /**
