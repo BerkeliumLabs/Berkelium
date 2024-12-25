@@ -359,6 +359,18 @@ export class DataFrame {
   }
 
   /**
+   * Returns a new DataFrame containing only the unique rows from the original DataFrame.
+   * The original DataFrame is not modified.
+   *
+   * @returns {DataFrame} - A new DataFrame with unique rows.
+   */
+  dedup(): DataFrame {
+    return new DataFrame(
+      this.data.filter((row, index) => this.data.indexOf(row) === index)
+    );
+  }
+
+  /**
    * Removes rows from the DataFrame that contain undefined values in any column.
    *
    * @returns {DataFrame} - A new DataFrame with rows containing undefined values removed.

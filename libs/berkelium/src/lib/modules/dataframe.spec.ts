@@ -182,6 +182,11 @@ describe('DataFrame', () => {
     expect(df2.hasWrongDataTypes()).toBe(true);
   });
 
+  test('Should deduplicate the DataFrame', () => {
+    const df2 = df.dedup();
+    expect(df2.shape).toEqual([30, 5]);
+  });
+
   test('should drop rows with null or undefined values', () => {
     const filteredDf = df.dropna();
     expect(filteredDf.shape).toEqual([17, 5]);
