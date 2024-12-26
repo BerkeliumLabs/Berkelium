@@ -227,6 +227,33 @@ export class DataFrame {
   }
 
   /**
+   * Returns the mode of the specified column.
+   *
+   * If the column is non-numeric, throws an error.
+   * If the column has no modes, returns undefined.
+   * If the column has one mode, returns that mode.
+   * If the column has multiple modes, returns the maximum of the modes.
+   *
+   * @param {string} column - The name of the column to find the mode of.
+   * @returns {number | undefined} - The mode of the column, or undefined if no mode exists.
+   */
+  mode(column: string): number | undefined {
+    if (this.dTypes[column] !== 'number') {
+      throw new Error(`Column ${column} is not numeric`);
+    }
+
+    const modes = this.calculateMode(this.array(column));
+
+    if (modes.length === 0) {
+      return undefined;
+    } else if (modes.length === 1) {
+      return modes[0];
+    } else {
+      return Math.max(...modes);
+    }
+  }
+
+  /**
    * Calculates the standard deviation of the specified column.
    *
    * @param {string} column - The name of the column to calculate the standard deviation for.
@@ -646,7 +673,7 @@ export class DataFrame {
    * Excludes 'undefined' types from consideration.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mostFrequentType(arr: any[]): DataType {
+  private mostFrequentType(arr: any[]): DataType {
     const frequencyMap = new Map();
     let maxCount = 0;
     let mostFrequentType = undefined;
@@ -666,6 +693,31 @@ export class DataFrame {
     }
 
     return mostFrequentType as DataType;
+  }
+
+  /**
+   * Calculates the mode(s) of a given array of numbers.
+   *
+   * @param {number[]} values - An array of numbers for which to calculate the mode(s).
+   * @returns {number[]} - An array containing the mode(s) of the input array.
+   * If all numbers appear with the same frequency, returns an empty array.
+   */
+  private calculateMode(values: number[]): number[] {
+    const frequencyMap = values.reduce((acc, value) => {
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+
+    const maxFrequency = Math.max(...Object.values(frequencyMap));
+    const modes = Object.keys(frequencyMap)
+      .filter((key) => frequencyMap[+key] === maxFrequency)
+      .map(Number);
+
+    if (modes.length === Object.keys(frequencyMap).length) {
+      return [];
+    }
+
+    return modes;
   }
 
   /**

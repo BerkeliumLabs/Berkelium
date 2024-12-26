@@ -131,6 +131,11 @@ describe('DataFrame', () => {
     expect(df.mean('Monthly Income')).toEqual(63480);
   });
 
+  test('Should calculate the mode of a numeric column', () => {
+    const df2 = df.fillna(df.median('Monthly Income'), 'Monthly Income');
+    expect(df2.mode('Monthly Income')).toEqual(62000);
+  });
+
   test('Should calculate the standard deviation of a numeric column', () => {
     // expect(df.std('Monthly Income')).toEqual(15006.98504);
     expect(df.std('Monthly Income')).toBeCloseTo(15006.98504);
