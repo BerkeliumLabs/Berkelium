@@ -289,6 +289,11 @@ describe('DataFrame', () => {
     expect(df.head().array('Age')).toEqual([29, 34, 45, undefined, 50]);
   });
 
+  test('Should transform column values in the DataFrame', () => {
+    const transformedDf = df.transform('Age', (value) => value * 2);
+    expect(transformedDf.head().array('Age')).toEqual([58, 68, 90, undefined, 100]);
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([

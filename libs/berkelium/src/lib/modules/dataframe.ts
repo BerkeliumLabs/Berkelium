@@ -653,6 +653,31 @@ export class DataFrame {
   }
 
   /**
+   * Applies a transformation to the specified column in the DataFrame.
+   *
+   * @param {string} column - The name of the column to transform.
+   * @param {(value: any) => any} fn - The transformation function to apply to each value in the
+   * specified column. The function should take a single argument, the value of the column in the
+   * current row, and return the transformed value.
+   * @returns {DataFrame} - A new DataFrame with the transformed column.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transform(column: string, fn: (value: any) => any): DataFrame {
+    if (!this.columns.includes(column)) {
+      throw new Error(`Column ${column} does not exist in the DataFrame.`);
+    }
+
+    const transformedData = this.data.map((row) => {
+      const newRow = { ...row };
+      if (!newRow[column]) return newRow;
+      newRow[column] = fn(row[column]);
+      return newRow;
+    });
+
+    return new DataFrame(transformedData);
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
