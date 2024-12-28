@@ -298,7 +298,20 @@ export class DataFrame {
    * @returns {Record<string, any>} - An object mapping each column to its summary statistics.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  describe(): Record<string, any> {
+  describe(categorical = false): Record<string, any> {
+    /* if (categorical) {
+      const categoricalColumns = this.columns.filter((col) =>
+        this.data.some((row) => typeof row[col] !== 'number')
+      );
+
+      return categoricalColumns.reduce((acc, col) => {
+        const stats = {
+          count: this.count(col),
+          mode: this.mode(col),
+        };
+        return { ...acc, [col]: stats };
+      }, {});
+    } */
     const numericalColumns = this.columns.filter((col) =>
       this.data.some((row) => typeof row[col] === 'number')
     );
@@ -678,6 +691,17 @@ export class DataFrame {
   }
 
   /**
+   * Returns an array of unique values in the specified column of the DataFrame.
+   *
+   * @param {string} column - The name of the column to extract unique values from.
+   * @returns {any[]} - An array of unique values in the specified column.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  unique(column: string): any[] {
+    return [...new Set(this.array(column).filter((value) => value !== undefined))];
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
@@ -743,6 +767,20 @@ export class DataFrame {
     }
 
     return modes;
+  }
+
+  private calculateFrequency(arr: Array<any>): Map<any, number> {
+    if (!Array.isArray(arr)) {
+      throw new Error('Input must be an array.');
+    }
+
+    const frequencyMap = new Map();
+
+    for (const item of arr) {
+      frequencyMap.set(item, (frequencyMap.get(item) || 0) + 1);
+    }
+
+    return frequencyMap;
   }
 
   /**

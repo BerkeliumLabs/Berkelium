@@ -294,6 +294,10 @@ describe('DataFrame', () => {
     expect(transformedDf.head().array('Age')).toEqual([58, 68, 90, undefined, 100]);
   });
 
+  test('Should display unique values in a column', () => {
+    expect(df.unique('City').length).toEqual(13);
+  });
+
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
     expect(df.head().print()).toEqual([
