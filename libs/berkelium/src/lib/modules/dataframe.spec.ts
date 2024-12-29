@@ -131,6 +131,11 @@ describe('DataFrame', () => {
     expect(df.mean('Monthly Income')).toEqual(63480);
   });
 
+  test('Should calculate the mode of a numeric column', () => {
+    const df2 = df.fillna(df.median('Monthly Income'), 'Monthly Income');
+    expect(df2.mode('Monthly Income')).toEqual(62000);
+  });
+
   test('Should calculate the standard deviation of a numeric column', () => {
     // expect(df.std('Monthly Income')).toEqual(15006.98504);
     expect(df.std('Monthly Income')).toBeCloseTo(15006.98504);
@@ -157,6 +162,20 @@ describe('DataFrame', () => {
     );
   });
 
+  test('Should discribe categorical columns', () => {
+    const description = df.describe(true);
+    // console.table(description);
+    expect(description).toHaveProperty('City');
+    expect(description['City']).toEqual(
+      expect.objectContaining({
+        count: 28,
+        unique: 13,
+        top: 'Colombo',
+        freq: 4,
+      })
+    );
+  });
+
   test('Should display whether a column has null or undefined values', () => {
     expect(df.isNull('Name')).toBe(true);
     expect(df.isNull('Date of Birth')).toBe(false);
@@ -172,10 +191,19 @@ describe('DataFrame', () => {
     expect(df.hasUndefined()).toBe(true);
   });
 
+  test('Should display whether the DataFrame has duplicate rows', () => {
+    expect(df.hasDuplicates()).toBe(false);
+  });
+
   test('Should display if the DataFrame has values with wrong data type', () => {
     df.updateElement(0, 'Monthly Income', '45000');
     const df2 = df.dropna();
     expect(df2.hasWrongDataTypes()).toBe(true);
+  });
+
+  test('Should deduplicate the DataFrame', () => {
+    const df2 = df.dedup();
+    expect(df2.shape).toEqual([30, 5]);
   });
 
   test('should drop rows with null or undefined values', () => {
@@ -273,6 +301,15 @@ describe('DataFrame', () => {
 
   test('Should display the values of the specified column from each row in the DataFrame.', () => {
     expect(df.head().array('Age')).toEqual([29, 34, 45, undefined, 50]);
+  });
+
+  test('Should transform column values in the DataFrame', () => {
+    const transformedDf = df.transform('Age', (value) => value * 2);
+    expect(transformedDf.head().array('Age')).toEqual([58, 68, 90, undefined, 100]);
+  });
+
+  test('Should display unique values in a column', () => {
+    expect(df.unique('City').length).toEqual(13);
   });
 
   test('Should print the DataFrame to the console', () => {

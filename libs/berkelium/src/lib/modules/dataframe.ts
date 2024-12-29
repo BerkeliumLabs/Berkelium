@@ -54,7 +54,7 @@ export class DataFrame {
     if (this.data.length === 0) return {};
 
     return this.columns.reduce((acc, col) => {
-      acc[col] = typeof this.data[0][col] as DataType;
+      acc[col] = this.mostFrequentType(this.array(col));
       return acc;
     }, {} as Record<string, DataType>);
   }
@@ -227,6 +227,33 @@ export class DataFrame {
   }
 
   /**
+   * Returns the mode of the specified column.
+   *
+   * If the column is non-numeric, throws an error.
+   * If the column has no modes, returns undefined.
+   * If the column has one mode, returns that mode.
+   * If the column has multiple modes, returns the maximum of the modes.
+   *
+   * @param {string} column - The name of the column to find the mode of.
+   * @returns {number | undefined} - The mode of the column, or undefined if no mode exists.
+   */
+  mode(column: string): number | undefined {
+    if (this.dTypes[column] !== 'number') {
+      throw new Error(`Column ${column} is not numeric`);
+    }
+
+    const modes = this.calculateMode(this.array(column));
+
+    if (modes.length === 0) {
+      return undefined;
+    } else if (modes.length === 1) {
+      return modes[0];
+    } else {
+      return Math.max(...modes);
+    }
+  }
+
+  /**
    * Calculates the standard deviation of the specified column.
    *
    * @param {string} column - The name of the column to calculate the standard deviation for.
@@ -256,41 +283,66 @@ export class DataFrame {
   }
 
   /**
-   * Returns a summary of each numerical column in the DataFrame.
+   * Returns a summary of the DataFrame's columns.
    *
-   * For each numerical column, the returned object contains the following statistics:
-   * - `count`: The number of rows with a value in the column.
-   * - `mean`: The mean value of the column.
-   * - `std`: The standard deviation of the column.
-   * - `min`: The minimum value in the column.
-   * - `25%`: The 25th percentile of the column.
-   * - `50%`: The median (50th percentile) of the column.
-   * - `75%`: The 75th percentile of the column.
-   * - `max`: The maximum value in the column.
+   * If `categorical` is true, returns a dictionary where the keys are the column names and the values are an object with the following properties:
+   *   - `count`: The number of rows in the DataFrame that have a value in the given column.
+   *   - `unique`: The number of unique values in the given column.
+   *   - `top`: The most frequent value in the given column.
+   *   - `freq`: The frequency of the most frequent value in the given column.
    *
-   * @returns {Record<string, any>} - An object mapping each column to its summary statistics.
+   * If `categorical` is false, returns a dictionary where the keys are the column names and the values are an object with the following properties:
+   *   - `count`: The number of rows in the DataFrame that have a value in the given column.
+   *   - `mean`: The mean of the given column.
+   *   - `std`: The standard deviation of the given column.
+   *   - `min`: The minimum value of the given column.
+   *   - `25%`: The 25th percentile of the given column.
+   *   - `50%`: The 50th percentile of the given column.
+   *   - `75%`: The 75th percentile of the given column.
+   *   - `max`: The maximum value of the given column.
+   *
+   * @param {boolean} [categorical=false] - Whether to calculate summary statistics for categorical or numerical columns.
+   * @returns {Record<string, any>} - A dictionary with the summary statistics for each column in the DataFrame.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  describe(): Record<string, any> {
-    const numericalColumns = this.columns.filter((col) =>
-      this.data.some((row) => typeof row[col] === 'number')
-    );
+  describe(categorical = false): Record<string, any> {
+    if (categorical) {
+      const categoricalColumns = this.columns.filter(
+        (col) => this.dTypes[col] !== 'number'
+      );
 
-    return Object.fromEntries(
-      numericalColumns.map((col) => {
+      return categoricalColumns.reduce((acc, col) => {
+        const freqMap = this.calculateFrequency(this.array(col));
+        const topFreq = this.getKeyWithMaxValue(freqMap);
         const stats = {
           count: this.count(col),
-          mean: Number(this.mean(col).toFixed(6)),
-          std: Number(this.std(col).toFixed(6)),
-          min: Number(this.min(col).toFixed(6)),
-          '25%': Number(this.quartiles(col)['25%'].toFixed(6)),
-          '50%': Number(this.quartiles(col)['50%'].toFixed(6)),
-          '75%': Number(this.quartiles(col)['75%'].toFixed(6)),
-          max: Number(this.max(col).toFixed(6)),
+          unique: this.unique(col).length,
+          top: topFreq[0],
+          freq: topFreq[1],
         };
-        return [col, stats];
-      })
-    );
+        return { ...acc, [col]: stats };
+      }, {});
+    } else {
+      const numericalColumns = this.columns.filter(
+        (col) => this.dTypes[col] === 'number'
+      );
+
+      return Object.fromEntries(
+        numericalColumns.map((col) => {
+          const stats = {
+            count: this.count(col),
+            mean: Number(this.mean(col).toFixed(6)),
+            std: Number(this.std(col).toFixed(6)),
+            min: Number(this.min(col).toFixed(6)),
+            '25%': Number(this.quartiles(col)['25%'].toFixed(6)),
+            '50%': Number(this.quartiles(col)['50%'].toFixed(6)),
+            '75%': Number(this.quartiles(col)['75%'].toFixed(6)),
+            max: Number(this.max(col).toFixed(6)),
+          };
+          return [col, stats];
+        })
+      );
+    }
   }
 
   /**
@@ -343,6 +395,30 @@ export class DataFrame {
       Object.keys(row).some(
         (column) => typeof row[column] !== this.dTypes[column]
       )
+    );
+  }
+
+  /**
+   * Checks if the DataFrame contains any duplicate rows.
+   *
+   * @returns {boolean} - True if the DataFrame contains duplicate rows, false otherwise.
+   */
+  hasDuplicates(): boolean {
+    return (
+      this.data.length !==
+      new Set(this.data.map((row) => JSON.stringify(row))).size
+    );
+  }
+
+  /**
+   * Returns a new DataFrame containing only the unique rows from the original DataFrame.
+   * The original DataFrame is not modified.
+   *
+   * @returns {DataFrame} - A new DataFrame with unique rows.
+   */
+  dedup(): DataFrame {
+    return new DataFrame(
+      this.data.filter((row, index) => this.data.indexOf(row) === index)
     );
   }
 
@@ -602,6 +678,44 @@ export class DataFrame {
   }
 
   /**
+   * Applies a transformation to the specified column in the DataFrame.
+   *
+   * @param {string} column - The name of the column to transform.
+   * @param {(value: any) => any} fn - The transformation function to apply to each value in the
+   * specified column. The function should take a single argument, the value of the column in the
+   * current row, and return the transformed value.
+   * @returns {DataFrame} - A new DataFrame with the transformed column.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transform(column: string, fn: (value: any) => any): DataFrame {
+    if (!this.columns.includes(column)) {
+      throw new Error(`Column ${column} does not exist in the DataFrame.`);
+    }
+
+    const transformedData = this.data.map((row) => {
+      const newRow = { ...row };
+      if (!newRow[column]) return newRow;
+      newRow[column] = fn(row[column]);
+      return newRow;
+    });
+
+    return new DataFrame(transformedData);
+  }
+
+  /**
+   * Returns an array of unique values in the specified column of the DataFrame.
+   *
+   * @param {string} column - The name of the column to extract unique values from.
+   * @returns {any[]} - An array of unique values in the specified column.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  unique(column: string): any[] {
+    return [
+      ...new Set(this.array(column).filter((value) => value !== undefined)),
+    ];
+  }
+
+  /**
    * Prints the DataFrame to the console.
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
@@ -611,6 +725,87 @@ export class DataFrame {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   print(): Record<string, any>[] {
     return this.data;
+  }
+
+  /**
+   * Determines the most frequent data type in the given array.
+   *
+   * @param {any[]} arr - An array of values to analyze.
+   * @returns {DataType} - The data type that appears most frequently in the array.
+   * If multiple data types have the same frequency, one of them is returned.
+   * Excludes 'undefined' types from consideration.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mostFrequentType(arr: any[]): DataType {
+    const frequencyMap = new Map();
+    let maxCount = 0;
+    let mostFrequentType = undefined;
+
+    for (const item of arr) {
+      const value = typeof item as DataType;
+
+      if (value !== 'undefined') {
+        const count = (frequencyMap.get(value) || 0) + 1;
+        frequencyMap.set(value, count);
+
+        if (count > maxCount) {
+          maxCount = count;
+          mostFrequentType = value;
+        }
+      }
+    }
+
+    return mostFrequentType as DataType;
+  }
+
+  /**
+   * Calculates the mode(s) of a given array of numbers.
+   *
+   * @param {number[]} values - An array of numbers for which to calculate the mode(s).
+   * @returns {number[]} - An array containing the mode(s) of the input array.
+   * If all numbers appear with the same frequency, returns an empty array.
+   */
+  private calculateMode(values: number[]): number[] {
+    const frequencyMap = values.reduce((acc, value) => {
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+
+    const maxFrequency = Math.max(...Object.values(frequencyMap));
+    const modes = Object.keys(frequencyMap)
+      .filter((key) => frequencyMap[+key] === maxFrequency)
+      .map(Number);
+
+    if (modes.length === Object.keys(frequencyMap).length) {
+      return [];
+    }
+
+    return modes;
+  }
+
+  /**
+   * Calculates the frequency of each item in a given array.
+   *
+   * @param {Array<any>} arr - An array of values for which to calculate the frequency.
+   * @returns {Map<any, number>} - A Map where the keys are the items in the array and the values
+   * are the number of times each item appears in the array. If an item is undefined, it is
+   * ignored. If the input array is empty, an empty Map is returned.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private calculateFrequency(arr: Array<any>): Map<any, number> {
+    if (!Array.isArray(arr)) {
+      throw new Error('Input must be an array.');
+    }
+
+    const frequencyMap = new Map();
+
+    for (const item of arr) {
+      if (item) {
+        frequencyMap.set(item, (frequencyMap.get(item) || 0) + 1);
+      }
+    }
+
+    return frequencyMap;
   }
 
   /**
@@ -661,6 +856,24 @@ export class DataFrame {
     }
 
     return true;
+  }
+
+  /**
+   * Finds the key-value pair with the maximum value in a given Map.
+   *
+   * @param {Map<any, number>} map - The Map to search.
+   * @returns {([any, number] | undefined)} - The key-value pair with the maximum value,
+   * or `undefined` if the Map is empty.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getKeyWithMaxValue(map: Map<any, number>): [any, number] {
+    if (map.size === 0) {
+      return [undefined, 0];
+    }
+
+    return [...map.entries()].reduce((maxEntry, currentEntry) => {
+      return currentEntry[1] > maxEntry[1] ? currentEntry : maxEntry;
+    });
   }
 }
 
