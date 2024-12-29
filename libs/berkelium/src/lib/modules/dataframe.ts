@@ -283,54 +283,66 @@ export class DataFrame {
   }
 
   /**
-   * Returns a summary of each numerical column in the DataFrame.
+   * Returns a summary of the DataFrame's columns.
    *
-   * For each numerical column, the returned object contains the following statistics:
-   * - `count`: The number of rows with a value in the column.
-   * - `mean`: The mean value of the column.
-   * - `std`: The standard deviation of the column.
-   * - `min`: The minimum value in the column.
-   * - `25%`: The 25th percentile of the column.
-   * - `50%`: The median (50th percentile) of the column.
-   * - `75%`: The 75th percentile of the column.
-   * - `max`: The maximum value in the column.
+   * If `categorical` is true, returns a dictionary where the keys are the column names and the values are an object with the following properties:
+   *   - `count`: The number of rows in the DataFrame that have a value in the given column.
+   *   - `unique`: The number of unique values in the given column.
+   *   - `top`: The most frequent value in the given column.
+   *   - `freq`: The frequency of the most frequent value in the given column.
    *
-   * @returns {Record<string, any>} - An object mapping each column to its summary statistics.
+   * If `categorical` is false, returns a dictionary where the keys are the column names and the values are an object with the following properties:
+   *   - `count`: The number of rows in the DataFrame that have a value in the given column.
+   *   - `mean`: The mean of the given column.
+   *   - `std`: The standard deviation of the given column.
+   *   - `min`: The minimum value of the given column.
+   *   - `25%`: The 25th percentile of the given column.
+   *   - `50%`: The 50th percentile of the given column.
+   *   - `75%`: The 75th percentile of the given column.
+   *   - `max`: The maximum value of the given column.
+   *
+   * @param {boolean} [categorical=false] - Whether to calculate summary statistics for categorical or numerical columns.
+   * @returns {Record<string, any>} - A dictionary with the summary statistics for each column in the DataFrame.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   describe(categorical = false): Record<string, any> {
-    /* if (categorical) {
-      const categoricalColumns = this.columns.filter((col) =>
-        this.data.some((row) => typeof row[col] !== 'number')
+    if (categorical) {
+      const categoricalColumns = this.columns.filter(
+        (col) => this.dTypes[col] !== 'number'
       );
 
       return categoricalColumns.reduce((acc, col) => {
+        const freqMap = this.calculateFrequency(this.array(col));
+        const topFreq = this.getKeyWithMaxValue(freqMap);
         const stats = {
           count: this.count(col),
-          mode: this.mode(col),
+          unique: this.unique(col).length,
+          top: topFreq[0],
+          freq: topFreq[1],
         };
         return { ...acc, [col]: stats };
       }, {});
-    } */
-    const numericalColumns = this.columns.filter((col) =>
-      this.data.some((row) => typeof row[col] === 'number')
-    );
+    } else {
+      const numericalColumns = this.columns.filter(
+        (col) => this.dTypes[col] === 'number'
+      );
 
-    return Object.fromEntries(
-      numericalColumns.map((col) => {
-        const stats = {
-          count: this.count(col),
-          mean: Number(this.mean(col).toFixed(6)),
-          std: Number(this.std(col).toFixed(6)),
-          min: Number(this.min(col).toFixed(6)),
-          '25%': Number(this.quartiles(col)['25%'].toFixed(6)),
-          '50%': Number(this.quartiles(col)['50%'].toFixed(6)),
-          '75%': Number(this.quartiles(col)['75%'].toFixed(6)),
-          max: Number(this.max(col).toFixed(6)),
-        };
-        return [col, stats];
-      })
-    );
+      return Object.fromEntries(
+        numericalColumns.map((col) => {
+          const stats = {
+            count: this.count(col),
+            mean: Number(this.mean(col).toFixed(6)),
+            std: Number(this.std(col).toFixed(6)),
+            min: Number(this.min(col).toFixed(6)),
+            '25%': Number(this.quartiles(col)['25%'].toFixed(6)),
+            '50%': Number(this.quartiles(col)['50%'].toFixed(6)),
+            '75%': Number(this.quartiles(col)['75%'].toFixed(6)),
+            max: Number(this.max(col).toFixed(6)),
+          };
+          return [col, stats];
+        })
+      );
+    }
   }
 
   /**
@@ -698,7 +710,9 @@ export class DataFrame {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   unique(column: string): any[] {
-    return [...new Set(this.array(column).filter((value) => value !== undefined))];
+    return [
+      ...new Set(this.array(column).filter((value) => value !== undefined)),
+    ];
   }
 
   /**
@@ -769,6 +783,15 @@ export class DataFrame {
     return modes;
   }
 
+  /**
+   * Calculates the frequency of each item in a given array.
+   *
+   * @param {Array<any>} arr - An array of values for which to calculate the frequency.
+   * @returns {Map<any, number>} - A Map where the keys are the items in the array and the values
+   * are the number of times each item appears in the array. If an item is undefined, it is
+   * ignored. If the input array is empty, an empty Map is returned.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private calculateFrequency(arr: Array<any>): Map<any, number> {
     if (!Array.isArray(arr)) {
       throw new Error('Input must be an array.');
@@ -777,7 +800,9 @@ export class DataFrame {
     const frequencyMap = new Map();
 
     for (const item of arr) {
-      frequencyMap.set(item, (frequencyMap.get(item) || 0) + 1);
+      if (item) {
+        frequencyMap.set(item, (frequencyMap.get(item) || 0) + 1);
+      }
     }
 
     return frequencyMap;
@@ -831,6 +856,24 @@ export class DataFrame {
     }
 
     return true;
+  }
+
+  /**
+   * Finds the key-value pair with the maximum value in a given Map.
+   *
+   * @param {Map<any, number>} map - The Map to search.
+   * @returns {([any, number] | undefined)} - The key-value pair with the maximum value,
+   * or `undefined` if the Map is empty.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getKeyWithMaxValue(map: Map<any, number>): [any, number] {
+    if (map.size === 0) {
+      return [undefined, 0];
+    }
+
+    return [...map.entries()].reduce((maxEntry, currentEntry) => {
+      return currentEntry[1] > maxEntry[1] ? currentEntry : maxEntry;
+    });
   }
 }
 

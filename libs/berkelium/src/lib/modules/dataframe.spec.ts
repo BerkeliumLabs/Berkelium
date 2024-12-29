@@ -162,6 +162,20 @@ describe('DataFrame', () => {
     );
   });
 
+  test('Should discribe categorical columns', () => {
+    const description = df.describe(true);
+    // console.table(description);
+    expect(description).toHaveProperty('City');
+    expect(description['City']).toEqual(
+      expect.objectContaining({
+        count: 28,
+        unique: 13,
+        top: 'Colombo',
+        freq: 4,
+      })
+    );
+  });
+
   test('Should display whether a column has null or undefined values', () => {
     expect(df.isNull('Name')).toBe(true);
     expect(df.isNull('Date of Birth')).toBe(false);
