@@ -1,7 +1,7 @@
 {
   "name": "@berkelium/berkelium",
   "description": "A lightweight JavaScript library for data analysis and manipulation.",
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.7",
   "dependencies": {},
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
