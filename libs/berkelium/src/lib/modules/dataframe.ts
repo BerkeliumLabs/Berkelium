@@ -68,7 +68,7 @@ export class DataFrame {
    */
   getDataTypes(): Record<string, DataType> {
     this.colDataTypes = this.columns.reduce((acc, col) => {
-      acc[col] = this.mostFrequentType(this.array(col));
+      acc[col] = this.mostFrequentType(this.array(col))[0];
       return acc;
     }, {} as Record<string, DataType>);
 
@@ -748,7 +748,7 @@ export class DataFrame {
    * Excludes 'undefined' types from consideration.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private mostFrequentType(arr: any[]): DataType {
+  private mostFrequentType(arr: any[]): [DataType, Map<DataType, number>] {
     const frequencyMap = new Map();
     let maxCount = 0;
     let mostFrequentType = undefined;
@@ -767,7 +767,7 @@ export class DataFrame {
       }
     }
 
-    return mostFrequentType as DataType;
+    return [mostFrequentType as DataType, frequencyMap];
   }
 
   /**
