@@ -1,6 +1,7 @@
 export class DataFrame {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private data: Record<string, any>[];
+  private colDataTypes: Record<string, DataType> = {};
 
   /**
    * Initializes a new instance of the DataFrame class with the provided data.
@@ -12,6 +13,7 @@ export class DataFrame {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(data: Record<string, any[]>[]) {
     this.data = data;
+    this.getDataTypes();
   }
 
   /**
@@ -53,10 +55,24 @@ export class DataFrame {
   get dTypes(): Record<string, DataType> {
     if (this.data.length === 0) return {};
 
-    return this.columns.reduce((acc, col) => {
+    return this.colDataTypes;
+  }
+
+  /**
+   * Gets the data types of each column in the DataFrame.
+   *
+   * @returns {Record<string, DataType>} - An object mapping each column name to its data type.
+   * If the DataFrame is empty, returns an empty object.
+   * This function is expensive and should only be called when the DataFrame is first created
+   * or when the data types of the columns have changed.
+   */
+  getDataTypes(): Record<string, DataType> {
+    this.colDataTypes = this.columns.reduce((acc, col) => {
       acc[col] = this.mostFrequentType(this.array(col));
       return acc;
     }, {} as Record<string, DataType>);
+
+    return this.colDataTypes;
   }
 
   /**
@@ -391,11 +407,7 @@ export class DataFrame {
    * @returns {boolean} - True if the DataFrame contains at least one row with a value of the wrong type, false otherwise.
    */
   hasWrongDataTypes(): boolean {
-    return this.data.some((row) =>
-      Object.keys(row).some(
-        (column) => typeof row[column] !== this.dTypes[column]
-      )
-    );
+    return this.columns.some((col) => !this.isSameType(col));
   }
 
   /**
