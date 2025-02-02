@@ -5,10 +5,10 @@ export class DataReader {
    *
    * @param {string} csvData - The CSV data as a string.
    * @param {string} [delimiter=','] - The delimiter used to separate values in the CSV data.
-   * @returns {Record<string, any>[]} An array of objects where each object corresponds to a row in the CSV data.
+   * @returns {Map<string, any>[]} An array of objects where each object corresponds to a row in the CSV data.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readCSV(csvData: string, delimiter = ','): Record<string, any>[] {
+  readCSV(csvData: string, delimiter = ','): Map<string, any>[] {
     // Split the data into rows
     const rows = csvData.trim().split('\n');
 
@@ -19,10 +19,10 @@ export class DataReader {
     const data = rows.slice(1).map((row) => {
       const values = row.split(delimiter).map((value) => value.trim());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return headers.reduce((obj: Record<string, any>, header: string, index: number) => {
-        obj[header] = values[index];
+      return headers.reduce((obj: Map<string, any>, header: string, index: number) => {
+        obj.set(header, values[index]);
         return obj;
-      }, {});
+      }, new Map());
     });
 
     const transformedData = this.transformDataTypes(data);
@@ -33,16 +33,16 @@ export class DataReader {
   /**
    * Converts string values in the data to their appropriate data types.
    * Detects and transforms strings to number, boolean, null, undefined, Date, object, or other types.
-   * @param {Record<string, any>[]} data - Array of objects representing the data.
-   * @returns {Record<string, any>[]} - Transformed data with inferred types.
+   * @param {Map<string, any>[]} data - Array of objects representing the data.
+   * @returns {Map<string, any>[]} - Transformed data with inferred types.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private transformDataTypes(data: Record<string, any>[]): Record<string, any>[] {
+  private transformDataTypes(data: Map<string, any>[]): Map<string, any>[] {
     return data.map((row) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const transformedRow: Record<string, any> = {};
-      Object.keys(row).forEach((key: string) => {
-        transformedRow[key] = this.inferType(row[key]);
+      const transformedRow: Map<string, any> = new Map();
+      row.forEach((value: any, key: string) => {
+        transformedRow.set(key, this.inferType(value));
       });
       return transformedRow;
     });
