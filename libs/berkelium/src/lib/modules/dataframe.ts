@@ -1,17 +1,17 @@
 export class DataFrame {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private data: Record<string, any>[];
-  private colDataTypes: Record<string, DataType> = {};
+  private data: Map<string, any>[];
+  private colDataTypes: Map<string, DataType> = new Map();
 
   /**
    * Initializes a new instance of the DataFrame class with the provided data.
    *
-   * @param {Record<string, any[]>[]} data - An array of records where each record
+   * @param {Map<string, any[]>[]} data - An array of records where each record
    * contains a string key and an array of any type values, representing the data
    * to be stored in the DataFrame.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(data: Record<string, any[]>[]) {
+  constructor(data: Map<string, any[]>[]) {
     this.data = data;
     this.getDataTypes();
   }
@@ -49,11 +49,11 @@ export class DataFrame {
   /**
    * Gets the data types of each column in the DataFrame.
    *
-   * @returns {Record<string, DataType>} - An object mapping each column name to its data type.
+   * @returns {Map<string, DataType>} - An object mapping each column name to its data type.
    * If the DataFrame is empty, returns an empty object.
    */
-  get dTypes(): Record<string, DataType> {
-    if (this.data.length === 0) return {};
+  get dTypes(): Map<string, DataType> {
+    if (this.data.length === 0) return new Map();
 
     return this.colDataTypes;
   }
@@ -61,16 +61,16 @@ export class DataFrame {
   /**
    * Gets the data types of each column in the DataFrame.
    *
-   * @returns {Record<string, DataType>} - An object mapping each column name to its data type.
+   * @returns {Map<string, DataType>} - An object mapping each column name to its data type.
    * If the DataFrame is empty, returns an empty object.
    * This function is expensive and should only be called when the DataFrame is first created
    * or when the data types of the columns have changed.
    */
-  getDataTypes(): Record<string, DataType> {
+  getDataTypes(): Map<string, DataType> {
     this.colDataTypes = this.columns.reduce((acc, col) => {
-      acc[col] = this.mostFrequentType(this.array(col))[0];
+      acc.set(col, this.mostFrequentType(this.array(col))[0]);
       return acc;
-    }, {} as Record<string, DataType>);
+    }, new Map() as Map<string, DataType>);
 
     return this.colDataTypes;
   }
@@ -82,7 +82,7 @@ export class DataFrame {
    * @returns {boolean} - `true` if all values in the column have the same data type as the column's data type; `false` otherwise.
    */
   isSameType(column: string): boolean {
-    return this.data.every((row) => typeof row[column] === this.dTypes[column]);
+    return this.data.every((row) => typeof row.get(column) === this.dTypes.get(column));
   }
 
   /**
@@ -90,14 +90,14 @@ export class DataFrame {
    * Each object contains the original row data with an additional "index" property set to the index of the row in the original DataFrame.
    * If no rows have a different data type, an empty array is returned.
    * @param {string} column - The name of the column to check.
-   * @returns {Record<string, any>[]} - An array of objects representing the rows with a different data type.
+   * @returns {Map<string, any>[]} - An array of objects representing the rows with a different data type.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getWrongTypeRows(column: string): Record<string, any>[] {
+  getWrongTypeRows(column: string): Map<string, any>[] {
     return this.data
       .map((row, index) => {
-        if (typeof row[column] !== this.dTypes[column]) {
-          row['index'] = index;
+        if (typeof row.get(column) !== this.dTypes.get(column)) {
+          row.set("index", index);
           return row;
         }
         return null;
@@ -113,7 +113,7 @@ export class DataFrame {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateElement(index: number, column: string, value: any): void {
-    this.data[index][column] = value;
+    this.data[index].set(column, value);
   }
 
   /**
@@ -152,7 +152,7 @@ export class DataFrame {
   /**
    * Returns an object containing information about the DataFrame.
    *
-   * @returns { { shape: [number, number], columns: string[], dTypes: Record<string, DataType> } }
+   * @returns { { shape: [number, number], columns: string[], dTypes: Map<string, DataType> } }
    * An object with the following properties:
    *  - `shape`: A tuple of two numbers representing the number of rows and columns in the DataFrame.
    *  - `columns`: An array of strings representing the column labels of the DataFrame.
@@ -161,7 +161,7 @@ export class DataFrame {
   info(): {
     shape: [number, number];
     columns: string[];
-    dTypes: Record<string, DataType>;
+    dTypes: Map<string, DataType>;
   } {
     const info = {
       shape: this.shape,
@@ -237,7 +237,7 @@ export class DataFrame {
    */
   mean(column: string): number {
     const values = this.data
-      .map((row) => row[column])
+      .map((row) => row.get(column))
       .filter((v) => typeof v === 'number');
     return values.reduce((acc, val) => acc + val, 0) / values.length;
   }
@@ -254,7 +254,7 @@ export class DataFrame {
    * @returns {number | undefined} - The mode of the column, or undefined if no mode exists.
    */
   mode(column: string): number | undefined {
-    if (this.dTypes[column] !== 'number') {
+    if (this.dTypes.get(column) !== 'number') {
       throw new Error(`Column ${column} is not numeric`);
     }
 
@@ -278,7 +278,7 @@ export class DataFrame {
   std(column: string): number {
     const mean = this.mean(column);
     const values = this.data
-      .map((row) => row[column])
+      .map((row) => row.get(column))
       .filter((v) => typeof v === 'number');
     return Math.sqrt(
       values.reduce((acc, val) => acc + (val - mean) ** 2, 0) / values.length
@@ -318,13 +318,13 @@ export class DataFrame {
    *   - `max`: The maximum value of the given column.
    *
    * @param {boolean} [categorical=false] - Whether to calculate summary statistics for categorical or numerical columns.
-   * @returns {Record<string, any>} - A dictionary with the summary statistics for each column in the DataFrame.
+   * @returns {Map<string, any>} - A dictionary with the summary statistics for each column in the DataFrame.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  describe(categorical = false): Record<string, any> {
+  describe(categorical = false): Map<string, any> {
     if (categorical) {
       const categoricalColumns = this.columns.filter(
-        (col) => this.dTypes[col] !== 'number'
+        (col) => this.dTypes.get(col) !== 'number'
       );
 
       return categoricalColumns.reduce((acc, col) => {
@@ -336,15 +336,14 @@ export class DataFrame {
           top: topFreq[0],
           freq: topFreq[1],
         };
-        return { ...acc, [col]: stats };
-      }, {});
+        return acc.set(col, stats);
+      }, new Map());
     } else {
       const numericalColumns = this.columns.filter(
-        (col) => this.dTypes[col] === 'number'
+        (col) => this.dTypes.get(col) === 'number'
       );
 
-      return Object.fromEntries(
-        numericalColumns.map((col) => {
+      return numericalColumns.reduce((acc, col) => {
           const stats = {
             count: this.count(col),
             mean: Number(this.mean(col).toFixed(6)),
@@ -355,9 +354,8 @@ export class DataFrame {
             '75%': Number(this.quartiles(col)['75%'].toFixed(6)),
             max: Number(this.max(col).toFixed(6)),
           };
-          return [col, stats];
-        })
-      );
+          return acc.set(col, stats);
+        }, new Map());
     }
   }
 
@@ -368,7 +366,7 @@ export class DataFrame {
    * @returns {boolean} - True if the column contains at least one null or undefined value, false otherwise.
    */
   isNull(column: string): boolean {
-    return this.data.some((row) => !this.isNotEmpty(row[column]));
+    return this.data.some((row) => !this.isNotEmpty(row.get(column)));
   }
 
   /**
@@ -441,7 +439,7 @@ export class DataFrame {
    */
   dropna(): DataFrame {
     const filteredData = this.data.filter((row) =>
-      this.columns.every((col) => row[col] !== undefined)
+      this.columns.every((col) => row.get(col) !== undefined)
     );
 
     return new DataFrame(filteredData);
@@ -460,15 +458,14 @@ export class DataFrame {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fillna(value: any, column?: string): DataFrame {
     const filteredData = this.data.map((row) => {
-      const newRow = { ...row };
       if (column) {
-        newRow[column] = row[column] ?? value;
+        row.set(column, row.get(column) ?? value);
       } else {
-        Object.keys(row).forEach((key) => {
-          newRow[key] = row[key] ?? value;
+        row.forEach((key) => {
+          row.set(key, row.get(key) ?? value);
         });
       }
-      return newRow;
+      return row;
     });
 
     return new DataFrame(filteredData);
@@ -478,17 +475,17 @@ export class DataFrame {
    * Counts the occurrences of each unique value in the specified column.
    *
    * @param {string} column - The name of the column to count unique values for.
-   * @returns {Record<any, number>} - An object mapping each unique value in the column
+   * @returns {Map<any, number>} - An object mapping each unique value in the column
    * to the number of times it appears in the DataFrame.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  valueCounts(column: string): Record<any, number> {
+  valueCounts(column: string): Map<any, number> {
     return this.data.reduce((acc, row) => {
-      const value = row[column];
-      acc[value] = (acc[value] || 0) + 1;
+      const value = row.get(column);
+      acc.set(value, (acc.get(value) || 0) + 1); //acc[value] = (acc[value] || 0) + 1;
       return acc;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }, {} as Record<any, number>);
+    }, {} as Map<any, number>);
   }
 
   /**
@@ -499,10 +496,10 @@ export class DataFrame {
    */
   selectDtypes(types: DataType[]): DataFrame {
     const filteredColumns = this.columns.filter((col) =>
-      types.includes(this.dTypes[col])
+      types.includes(this.dTypes.get(col) as DataType)
     );
     const filteredData = this.data.map((row) =>
-      Object.fromEntries(filteredColumns.map((col) => [col, row[col]]))
+      new Map(filteredColumns.map((col) => [col, row.get(col)]))
     );
 
     return new DataFrame(filteredData);
@@ -511,37 +508,15 @@ export class DataFrame {
   /**
    * Filters the DataFrame to only include rows that satisfy the given predicate.
    *
-   * @param { (row: Record<string, any>) => boolean } predicate - A function that takes
+   * @param { (row: Map<string, any>) => boolean } predicate - A function that takes
    * a row as an argument and returns a boolean indicating whether the row should be
    * included in the filtered DataFrame.
    * @returns {DataFrame} - A new DataFrame containing only the filtered rows.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  filter(predicate: (row: Record<string, any>) => boolean): DataFrame {
+  filter(predicate: (row: Map<string, any>) => boolean): DataFrame {
     const filteredData = this.data.filter(predicate);
     return new DataFrame(filteredData);
-  }
-
-  /**
-   * Groups the DataFrame by the given column and returns a new object with the unique values
-   * of the column as keys and the corresponding DataFrames as values.
-   *
-   * @param {string} col - The column to group by.
-   * @returns {Record<string, DataFrame>} - A new object with the grouped DataFrames.
-   */
-  groupBy(col: string): Record<string, DataFrame> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groups: Record<string, Record<string, any>[]> = {};
-
-    this.data.forEach((row) => {
-      const key = row[col];
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(row);
-    });
-
-    return Object.fromEntries(
-      Object.entries(groups).map(([key, group]) => [key, new DataFrame(group)])
-    );
   }
 
   /**
@@ -607,7 +582,7 @@ export class DataFrame {
    */
   delete(column: string) {
     const newData = this.data.map((row) => {
-      delete row[column];
+      row.delete(column);
       return row;
     });
     return new DataFrame(newData);
@@ -616,26 +591,27 @@ export class DataFrame {
   /**
    * Calculates the variance of each numerical column in the DataFrame.
    *
-   * @returns {Record<string, any>[]} - An array of objects, each containing the name of a
+   * @returns {Map<string, any>[]} - An array of objects, each containing the name of a
    * numerical column and its variance.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  var(): Record<string, any>[] {
+  var(): Map<string, any>[] {
     const numericalColumns = this.columns.filter((col) =>
-      this.data.some((row) => typeof row[col] === 'number')
+      this.data.some((row) => typeof row.get(col) === 'number')
     );
-    return numericalColumns.map((col) => ({
-      column: col,
-      variance: this.calculateVariance(col),
-    }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return numericalColumns.map((col) => new Map<string, any>([
+      ['column', col],
+      ['variance', this.calculateVariance(col)],
+    ]));
   }
 
-  /* cov(): Record<string, any>[] {
+  /* cov(): Map<string, any>[] {
     const numericalColumns = this.columns.filter((col) => this.data.some((row) => typeof row[col] === 'number'));
-    const results: Record<string, any>[] = [];
+    const results: Map<string, any>[] = [];
 
     for (const col1 of numericalColumns) {
-      const row: Record<string, any> = { column: col1 };
+      const row: Map<string, any> = { column: col1 };
       for (const col2 of numericalColumns) {
         row[col2] = this.calculateCovariance(col1, col2);
       }
@@ -686,7 +662,7 @@ export class DataFrame {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   array(col: string): any[] {
-    return this.data.map((row) => row[col]);
+    return this.data.map((row) => row.get(col));
   }
 
   /**
@@ -705,10 +681,9 @@ export class DataFrame {
     }
 
     const transformedData = this.data.map((row) => {
-      const newRow = { ...row };
-      if (!newRow[column]) return newRow;
-      newRow[column] = fn(row[column]);
-      return newRow;
+      if (!row.get(column)) return row;
+      row.set(column, fn(row.get(column)));
+      return row;
     });
 
     return new DataFrame(transformedData);
@@ -732,10 +707,10 @@ export class DataFrame {
    *
    * Returns the DataFrame data as an array of objects, which can be logged to the console.
    *
-   * @returns {Record<string, any>[]} - The DataFrame data as an array of objects.
+   * @returns {Map<string, any>[]} - The DataFrame data as an array of objects.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  print(): Record<string, any>[] {
+  print(): Map<string, any>[] {
     return this.data;
   }
 
@@ -779,13 +754,13 @@ export class DataFrame {
    */
   private calculateMode(values: number[]): number[] {
     const frequencyMap = values.reduce((acc, value) => {
-      acc[value] = (acc[value] || 0) + 1;
+      acc.set(value, (acc.get(value) || 0) + 1);
       return acc;
-    }, {} as Record<number, number>);
+    }, new Map() as Map<number, number>);
 
     const maxFrequency = Math.max(...Object.values(frequencyMap));
     const modes = Object.keys(frequencyMap)
-      .filter((key) => frequencyMap[+key] === maxFrequency)
+      .filter((key) => frequencyMap.get(+key) === maxFrequency)
       .map(Number);
 
     if (modes.length === Object.keys(frequencyMap).length) {
