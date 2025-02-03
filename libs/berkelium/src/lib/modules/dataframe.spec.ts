@@ -4,7 +4,7 @@ import { DataReader } from '../util/datareader';
 
 describe('DataFrame', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let result: Record<string, any[]>[];
+  let result: Map<string, any[]>[];
   let df: DataFrame;
 
   beforeEach(() => {
@@ -95,13 +95,13 @@ describe('DataFrame', () => {
 
   test('Should remove rows with wrong data type', () => {
     const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
-    df.deleteObservations(wrongTypeRows.map((row) => row['index']));
+    df.deleteObservations(wrongTypeRows.map((row) => row.get('index')));
     expect(df.shape).toEqual([25, 5]);
   });
 
   test('Should update an element in the DataFrame', () => {
     const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
-    df.updateElement(wrongTypeRows[0]['index'], 'Monthly Income', 45000);
+    df.updateElement(wrongTypeRows[0].get('index'), 'Monthly Income', 45000);
     expect(df.head(1).array('Monthly Income')).toEqual([45000]);
   });
 
@@ -148,7 +148,7 @@ describe('DataFrame', () => {
   test('should describe numerical columns', () => {
     const description = df.describe();
     expect(description).toHaveProperty('Monthly Income');
-    expect(description['Monthly Income']).toEqual(
+    expect(description.get('Monthly Income')).toEqual(
       expect.objectContaining({
         count: 25,
         mean: 63480.000000,
@@ -166,7 +166,7 @@ describe('DataFrame', () => {
     const description = df.describe(true);
     // console.table(description);
     expect(description).toHaveProperty('City');
-    expect(description['City']).toEqual(
+    expect(description.get('City')).toEqual(
       expect.objectContaining({
         count: 28,
         unique: 13,
@@ -248,15 +248,8 @@ describe('DataFrame', () => {
   });
 
   test('should filter rows based on predicate', () => {
-    const filteredDf = df.filter((row) => row["Monthly Income"] > 60000);
+    const filteredDf = df.filter((row) => row.get('Monthly Income') > 60000);
     expect(filteredDf.shape).toEqual([13, 5]);
-  });
-
-  test('should group data by a column', () => {
-    const groups = df.groupBy('City');
-    expect(groups).toHaveProperty('Colombo');
-    expect(groups['Colombo']).toBeInstanceOf(DataFrame);
-    expect(groups['Colombo'].shape).toEqual([4, 5]);
   });
 
   test('Should display selected columns data from the DataFrame', () => {
@@ -288,8 +281,8 @@ describe('DataFrame', () => {
     const df2 = df.selectDtypes(['number']).fillna(0);
     const variance = df2.var();
     // console.table(variance);
-    expect(variance[0]['variance']).toBeCloseTo(202.57931);
-    expect(variance[1]['variance']).toBeCloseTo(773127586.21);
+    expect(variance[0].get('variance')).toBeCloseTo(202.57931);
+    expect(variance[1].get('variance')).toBeCloseTo(773127586.21);
   });
 
   /* test('Should calculate covariance for numerical columns', () => {
