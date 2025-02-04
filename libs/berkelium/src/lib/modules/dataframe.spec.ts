@@ -38,7 +38,7 @@ describe('DataFrame', () => {
   });
 
   test('should calculate dtypes correctly', () => {
-    expect(df.dTypes).toEqual({
+    expect(Object.fromEntries(df.dTypes)).toEqual({
       Name: 'string',
       City: 'string',
       Age: 'number',
@@ -214,7 +214,7 @@ describe('DataFrame', () => {
   test('should fill null or undefined values', () => {
     const filledDf = df.fillna(0);
     expect(filledDf.shape).toEqual([30, 5]);
-    expect(filledDf.head().print()).toEqual([
+    expect(filledDf.head().print().map((row) => Object.fromEntries(row))).toEqual([
       { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
       { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": 0, "Date of Birth": "1990-03-22" },
       { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },
@@ -307,7 +307,7 @@ describe('DataFrame', () => {
 
   test('Should print the DataFrame to the console', () => {
     console.table(df.head().print());
-    expect(df.head().print()).toEqual([
+    expect(df.head().print().map((row) => Object.fromEntries(row))).toEqual([
       { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
       { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": undefined, "Date of Birth": "1990-03-22" },
       { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },

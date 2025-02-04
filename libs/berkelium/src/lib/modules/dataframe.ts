@@ -22,7 +22,7 @@ export class DataFrame {
    * @returns {string[]} - An array of strings containing the column names of the DataFrame.
    */
   get columns(): string[] {
-    return this.data.length > 0 ? Object.keys(this.data[0]) : [];
+    return this.data.length > 0 ? Array.from(this.data[0]?.keys()) : [];
   }
 
   /**
@@ -146,7 +146,7 @@ export class DataFrame {
   }
 
   copy(): DataFrame {
-    return new DataFrame(JSON.parse(JSON.stringify(this.data)));
+    return new DataFrame(this.data);
   }
 
   /**
