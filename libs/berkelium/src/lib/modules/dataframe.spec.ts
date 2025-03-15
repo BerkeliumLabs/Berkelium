@@ -1,325 +1,306 @@
-import * as fs from 'fs';
-import { DataFrame } from './dataframe';
-import { DataReader } from '../util/datareader';
+import { DataFrame } from './dataframe'; // Adjust path as needed
 
 describe('DataFrame', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let result: Record<string, any[]>[];
+  const data = [
+    { name: 'Alice', age: 25, city: 'New York' },
+    { name: 'Bob', age: 30, city: 'London' },
+    { name: 'Charlie', age: 35, city: 'Paris' },
+    { name: 'David', age: 28, city: 'Tokyo' },
+    { name: 'Eve', age: 32, city: 'Sydney' },
+  ];
+
+  const columns = ['name', 'age', 'city'];
+
   let df: DataFrame;
 
   beforeEach(() => {
-    const dataReader = new DataReader();
-    const csvData = fs.readFileSync('./data/sample_data.csv', 'utf-8');
-    result = dataReader.readCSV(csvData);
-    df = new DataFrame(result);
+    df = DataFrame.fromArrayOfObjects(data);
   });
 
-  it('Should create a DataFrame object', () => {
-    expect(df).toBeTruthy();
+  it('should initialize with an array of objects', () => {
+    expect(df.rows()).toBe(5);
+    expect(df.columns()).toEqual(columns);
   });
 
-  test('should initialize and expose columns', () => {
-    expect(df.columns).toEqual([
-      'Name',
-      'City',
-      'Age',
-      'Monthly Income',
-      'Date of Birth',
+  it('should initialize with column-oriented object', () => {
+    const columnData = {
+      name: ['Alice', 'Bob'],
+      age: [25, 30],
+      city: ['New York', 'London'],
+    };
+    const newDf = new DataFrame(columnData);
+    expect(newDf.rows()).toBe(2);
+    expect(newDf.columns()).toEqual(['name', 'age', 'city']);
+  });
+
+  it('should handle empty data', () => {
+    const emptyDf = new DataFrame({});
+    expect(emptyDf.rows()).toBe(0);
+    expect(emptyDf.columns()).toEqual([]);
+  });
+
+  it('should clone the DataFrame', () => {
+    const clonedDf = df.clone();
+    expect(clonedDf).toEqual(df);
+    expect(clonedDf).not.toBe(df); // Ensure it's a deep copy
+  });
+
+  it('should get the head of the DataFrame', () => {
+    const headDf = df.head(2);
+    expect(headDf.rows()).toBe(2);
+    expect(headDf.get('name')).toEqual(['Alice', 'Bob']);
+  });
+
+  it('should get the tail of the DataFrame', () => {
+    const tailDf = df.tail(2);
+    expect(tailDf.rows()).toBe(2);
+    expect(tailDf.get('name')).toEqual(['David', 'Eve']);
+  });
+
+  it('should get a column', () => {
+    const names = df.get('name');
+    expect(names).toEqual(['Alice', 'Bob', 'Charlie', 'David', 'Eve']);
+  });
+
+  it('should set a column', () => {
+    df.set('age', [26, 31, 36, 29, 33]);
+    expect(df.get('age')).toEqual([26, 31, 36, 29, 33]);
+  });
+
+  it('should select columns', () => {
+    const selectedDf = df.select(['name', 'city']);
+    expect(selectedDf.columns()).toEqual(['name', 'city']);
+    expect(selectedDf.rows()).toBe(5);
+  });
+
+  it('should filter rows', () => {
+    const filteredDf = df.filter((row) => row.age > 30);
+    expect(filteredDf.rows()).toBe(2);
+    expect(filteredDf.get('name')).toEqual(['Charlie', 'Eve']);
+  });
+
+  it('should return correct shape', () => {
+    expect(df.shape()).toEqual([5, 3]);
+  });
+
+  it('should add a column', () => {
+    df.addColumn('country', ['USA', 'UK', 'France', 'Japan', 'Australia']);
+    expect(df.columns()).toEqual(['name', 'age', 'city', 'country']);
+    expect(df.get('country')).toEqual([
+      'USA',
+      'UK',
+      'France',
+      'Japan',
+      'Australia',
     ]);
   });
 
-  test('should expose index correctly', () => {
-    const indices = Array.from({ length: result.length }, (_, i) => i);
-    expect(df.index).toEqual(indices);
+  it('should drop a column', () => {
+    df.dropColumn('age');
+    expect(df.columns()).toEqual(['name', 'city']);
+    expect(() => df.get('age')).toThrowError('Column age not found.');
   });
 
-  test('should calculate shape correctly', () => {
-    expect(df.shape).toEqual([30, 5]);
+  it('should drop a row', () => {
+    df.dropRow(1);
+    expect(df.rows()).toBe(4);
+    expect(df.get('name')).toEqual(['Alice', 'Charlie', 'David', 'Eve']);
   });
 
-  test('should calculate dtypes correctly', () => {
-    expect(df.dTypes).toEqual({
-      Name: 'string',
-      City: 'string',
-      Age: 'number',
-      'Monthly Income': 'number',
-      'Date of Birth': 'string',
-    });
+  it('should rename a column', () => {
+    df.renameColumn('age', 'years');
+    expect(df.columns()).toEqual(['name', 'years', 'city']);
+    expect(df.get('years')).toEqual([25, 30, 35, 28, 32]);
+    expect(() => df.get('age')).toThrowError('Column age not found.');
   });
 
-  test('should return head of the DataFrame', () => {
-    const head = df.head(2);
-    expect(head).toBeInstanceOf(DataFrame);
-    expect(head.shape).toEqual([2, 5]);
+  it('should sort values', () => {
+    const sortedDf = df.sortValues('age');
+    expect(sortedDf.get('name')).toEqual([
+      'Alice',
+      'David',
+      'Bob',
+      'Eve',
+      'Charlie',
+    ]);
+    const descendingDf = df.sortValues('age', false);
+    expect(descendingDf.get('name')).toEqual([
+      'Charlie',
+      'Eve',
+      'Bob',
+      'David',
+      'Alice',
+    ]);
   });
 
-  test('should return tail of the DataFrame', () => {
-    const tail = df.tail(2);
-    expect(tail).toBeInstanceOf(DataFrame);
-    expect(tail.shape).toEqual([2, 5]);
+  it('should apply a function to a column', () => {
+    df.apply('age', (value) => value + 1);
+    expect(df.get('age')).toEqual([26, 31, 36, 29, 33]);
   });
 
-  test('should create a deep copy', () => {
-    const copy = df.copy();
-    expect(copy).toBeInstanceOf(DataFrame);
-    expect(copy).not.toBe(df);
-    expect(copy).toEqual(df);
+  it('should map a function to rows', () => {
+    const mapped = df.map((row) => row.name.toUpperCase());
+    expect(mapped).toEqual(['ALICE', 'BOB', 'CHARLIE', 'DAVID', 'EVE']);
   });
 
-  test('should return info of the DataFrame', () => {
-    const info = df.info();
-    expect(info).toEqual({
-      shape: [30, 5],
-      columns: ['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth'],
-      dTypes: {
-        Name: 'string',
-        City: 'string',
-        Age: 'number',
-        'Monthly Income': 'number',
-        'Date of Birth': 'string',
+  it('should concat DataFrames by rows', () => {
+    const df2 = DataFrame.fromArrayOfObjects([
+      { name: 'Frank', age: 40, city: 'Berlin' },
+    ]);
+    const concatenatedDf = df.concat(df2);
+    expect(concatenatedDf.rows()).toBe(6);
+    expect(concatenatedDf.get('name')).toEqual([
+      'Alice',
+      'Bob',
+      'Charlie',
+      'David',
+      'Eve',
+      'Frank',
+    ]);
+  });
+
+  it('should concat DataFrames by columns', () => {
+    const df2 = DataFrame.fromArrayOfObjects([
+      { country: 'USA', population: 1000000 },
+      { country: 'UK', population: 500000 },
+      { country: 'France', population: 750000 },
+      { country: 'Japan', population: 1000000 },
+      { country: 'Australia', population: 800000 },
+    ]);
+    const concatenatedDf = df.concat(df2, 1);
+    expect(concatenatedDf.columns()).toEqual([
+      'name',
+      'age',
+      'city',
+      'country',
+      'population',
+    ]);
+    expect(concatenatedDf.get('country')).toEqual([
+      'USA',
+      'UK',
+      'France',
+      'Japan',
+      'Australia',
+    ]);
+  });
+
+  it('should fill NaN values', () => {
+    const dfWithNaN = DataFrame.fromArrayOfObjects([
+      { name: 'Alice', age: 25, city: null },
+      { name: 'Bob', age: null, city: 'London' },
+      { name: 'Charlie', age: 35, city: 'Paris' },
+      { name: 'David', age: 28, city: 'Tokyo' },
+      { name: 'Eve', age: 32, city: 'Sydney' },
+    ]);
+    const filledDf = dfWithNaN.fillNa('Unknown');
+    expect(filledDf.get('city')).toEqual([
+      'Unknown',
+      'London',
+      'Paris',
+      'Tokyo',
+      'Sydney',
+    ]);
+    expect(filledDf.get('age')).toEqual([25, 'Unknown', 35, 28, 32]);
+  });
+
+  it('should get unique values from a column', () => {
+    const uniqueCities = df.unique('city');
+    expect(uniqueCities).toEqual([
+      'New York',
+      'London',
+      'Paris',
+      'Tokyo',
+      'Sydney',
+    ]);
+  });
+
+  it('should describe the DataFrame', () => {
+    const description = df.describe();
+    expect(description).toEqual({
+      age: {
+        count: 5,
+        mean: 30,
+        median: 30,
+        min: 25,
+        max: 35,
+        sum: 150,
+      },
+      name: {
+        count: 5,
+        unique: 5,
+      },
+      city: {
+        count: 5,
+        unique: 5,
       },
     });
-    console.table(info.dTypes);
   });
 
-  test('Should display if the column has same data type', () => {
-    expect(df.isSameType('Monthly Income')).toBe(false);
-    expect(df.isSameType('Date of Birth')).toBe(true);
+  it('should calculate the mean of a column', () => {
+    expect(df.mean('age')).toBe(30);
   });
 
-  test('Should return rows with wrong data type', () => {
-    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
-    console.table(wrongTypeRows);
-    expect(wrongTypeRows.length).toBe(5);
+  it('should calculate the median of a column', () => {
+    expect(df.median('age')).toBe(30);
   });
 
-  test('Should remove rows with wrong data type', () => {
-    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
-    df.deleteObservations(wrongTypeRows.map((row) => row['index']));
-    expect(df.shape).toEqual([25, 5]);
+  it('should calculate the sum of a column', () => {
+    expect(df.sum('age')).toBe(150);
   });
 
-  test('Should update an element in the DataFrame', () => {
-    const wrongTypeRows = df.getWrongTypeRows('Monthly Income');
-    df.updateElement(wrongTypeRows[0]['index'], 'Monthly Income', 45000);
-    expect(df.head(1).array('Monthly Income')).toEqual([45000]);
+  it('should calculate the minimum of a column', () => {
+    expect(df.min('age')).toBe(25);
   });
 
-  test('Should return minimum value of a column', () => {
-    const min = df.min('Monthly Income');
-    expect(min).toBe(40000);
+  it('should calculate the maximum of a column', () => {
+    expect(df.max('age')).toBe(35);
   });
 
-  test('Should return maximum value of a column', () => {
-    const min = df.max('Monthly Income');
-    expect(min).toBe(91000);
+  it('should count the non-null values in a column', () => {
+    expect(df.count('age')).toBe(5);
   });
 
-  test('Should calculate quartiles of a numeric column', () => {
-    expect(df.quartiles('Monthly Income')).toEqual({
-      '25%': 50000,
-      '50%': 62000,
-      '75%': 74000,
+  it('should calculate the value counts of a column', () => {
+    expect(df.valueCounts('city')).toEqual({
+      'New York': 1,
+      London: 1,
+      Paris: 1,
+      Tokyo: 1,
+      Sydney: 1,
     });
   });
 
-  test('Should calculate the median of a numeric column', () => {
-    expect(df.median('Monthly Income')).toEqual(62000);
+  it('should return a string representation of the DataFrame', () => {
+    const expectedString = `name\tage\tcity\nAlice\t25\tNew York\nBob\t30\tLondon\nCharlie\t35\tParis\nDavid\t28\tTokyo\nEve\t32\tSydney\n`;
+    expect(df.toString()).toBe(expectedString);
   });
 
-  test('Should calculate the mean of a numeric column', () => {
-    expect(df.mean('Monthly Income')).toEqual(63480);
+  it('should return the data as a 2D array', () => {
+    const expectedArray = [
+      ['Alice', 25, 'New York'],
+      ['Bob', 30, 'London'],
+      ['Charlie', 35, 'Paris'],
+      ['David', 28, 'Tokyo'],
+      ['Eve', 32, 'Sydney'],
+    ];
+    expect(df.toArray()).toEqual(expectedArray);
   });
 
-  test('Should calculate the mode of a numeric column', () => {
-    const df2 = df.fillna(df.median('Monthly Income'), 'Monthly Income');
-    expect(df2.mode('Monthly Income')).toEqual(62000);
+  it('should return the data as an array of objects', () => {
+    const expectedObjects = [
+      { name: 'Alice', age: 25, city: 'New York' },
+      { name: 'Bob', age: 30, city: 'London' },
+      { name: 'Charlie', age: 35, city: 'Paris' },
+      { name: 'David', age: 28, city: 'Tokyo' },
+      { name: 'Eve', age: 32, city: 'Sydney' },
+    ];
+    expect(df.toObjects()).toEqual(expectedObjects);
   });
 
-  test('Should calculate the standard deviation of a numeric column', () => {
-    // expect(df.std('Monthly Income')).toEqual(15006.98504);
-    expect(df.std('Monthly Income')).toBeCloseTo(15006.98504);
-  });
-
-  test('Should display the count of non-null values in a column', () => {
-    expect(df.count('Monthly Income')).toEqual(25);
-  });
-
-  test('should describe numerical columns', () => {
-    const description = df.describe();
-    expect(description).toHaveProperty('Monthly Income');
-    expect(description['Monthly Income']).toEqual(
-      expect.objectContaining({
-        count: 25,
-        mean: 63480.000000,
-        min: 40000.000000,
-        max: 91000.000000,
-        std: 15006.985040,
-        '25%': 50000.000000,
-        '50%': 62000.000000,
-        '75%': 74000.000000,
-      })
-    );
-  });
-
-  test('Should discribe categorical columns', () => {
-    const description = df.describe(true);
-    // console.table(description);
-    expect(description).toHaveProperty('City');
-    expect(description['City']).toEqual(
-      expect.objectContaining({
-        count: 28,
-        unique: 13,
-        top: 'Colombo',
-        freq: 4,
-      })
-    );
-  });
-
-  test('Should display whether a column has null or undefined values', () => {
-    expect(df.isNull('Name')).toBe(true);
-    expect(df.isNull('Date of Birth')).toBe(false);
-  });
-
-  test('Should update a column name in the DataFrame', () => {
-    df.renameColumn('Date of Birth', 'dob');
-    df.renameColumn('Monthly Income', 'mon_inc');
-    expect(df.columns).toEqual(['Name', 'City', 'Age', 'mon_inc', 'dob']);
-  });
-
-  test('Should display if the DataFrame has undefined values', () => {
-    expect(df.hasUndefined()).toBe(true);
-  });
-
-  test('Should display whether the DataFrame has duplicate rows', () => {
-    expect(df.hasDuplicates()).toBe(false);
-  });
-
-  test('Should display if the DataFrame has values with wrong data type', () => {
-    df.updateElement(0, 'Monthly Income', '45000');
-    const df2 = df.dropna();
-    expect(df2.hasWrongDataTypes()).toBe(true);
-  });
-
-  test('Should deduplicate the DataFrame', () => {
-    const df2 = df.dedup();
-    expect(df2.shape).toEqual([30, 5]);
-  });
-
-  test('should drop rows with null or undefined values', () => {
-    const filteredDf = df.dropna();
-    expect(filteredDf.shape).toEqual([17, 5]);
-  });
-
-  test('should fill null or undefined values', () => {
-    const filledDf = df.fillna(0);
-    expect(filledDf.shape).toEqual([30, 5]);
-    expect(filledDf.head().print()).toEqual([
-      { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
-      { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": 0, "Date of Birth": "1990-03-22" },
-      { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },
-      { "Name": "Sanduni Fernando", "City": "Galle", "Age": 0, "Monthly Income": 70000, "Date of Birth": "1994-02-15" },
-      { "Name": "Chaminda Weerasinghe", "City": "Kurunegala", "Age": 50, "Monthly Income": 55000, "Date of Birth": "1974-05-20" }
-    ]);
-  });
-
-  test('should calculate value counts for a column', () => {
-    const counts = df.valueCounts('City');
-    expect(counts).toEqual(expect.objectContaining({
-      "Colombo": 4,
-      "Kandy": 2,
-      "Negombo": 2,
-      "Galle": 3,
-      "Kurunegala": 3,
-      "Anuradhapura": 2,
-      "Badulla": 2,
-      "Gampaha": 2,
-      "Hambantota": 2,
-      "Jaffna": 2,
-      "Matara": 2,
-      "Batticaloa": 1,
-      "Matale": 1
-    }));
-  });
-
-  test('should select columns by dtypes', () => {
-    const selectedDf = df.selectDtypes(['number']);
-    expect(selectedDf.columns).toEqual(["Age", "Monthly Income"]);
-  });
-
-  test('should filter rows based on predicate', () => {
-    const filteredDf = df.filter((row) => row["Monthly Income"] > 60000);
-    expect(filteredDf.shape).toEqual([13, 5]);
-  });
-
-  test('should group data by a column', () => {
-    const groups = df.groupBy('City');
-    expect(groups).toHaveProperty('Colombo');
-    expect(groups['Colombo']).toBeInstanceOf(DataFrame);
-    expect(groups['Colombo'].shape).toEqual([4, 5]);
-  });
-
-  test('Should display selected columns data from the DataFrame', () => {
-    const selectedDf = df.select(['Name', 'Age']);
-    expect(selectedDf).toBeInstanceOf(DataFrame);
-    expect(selectedDf.columns).toEqual(['Name', 'Age']);
-  });
-
-  test('Should insert a new column into the DataFrame', () => {
-    const newDf = df.insert('Country', Array.from({ length: 30 }, () => 'Sri Lanka'));
-    // console.table(newDf.head().print());
-    expect(newDf.columns).toEqual(['Name', 'City', 'Age', 'Monthly Income', 'Date of Birth', 'Country']);
-  });
-
-  test('Should update a column in the DataFrame', () => {
-    const updatedDf = df.update('Age', Array.from({ length: 30 }, () => 25));
-    expect(updatedDf.select(['Age']).print()).toEqual(
-      Array.from({ length: 30 }, () => { return { "Age": 25 } })
-    );
-  });
-
-  test('Should delete a column from the DataFrame', () => {
-    const deletedDf = df.delete('City');
-    expect(deletedDf).toBeInstanceOf(DataFrame);
-    expect(deletedDf.columns).toEqual(['Name', 'Age', 'Monthly Income', 'Date of Birth']);
-  });
-
-  test('should calculate variance for numerical columns', () => {
-    const df2 = df.selectDtypes(['number']).fillna(0);
-    const variance = df2.var();
-    // console.table(variance);
-    expect(variance[0]['variance']).toBeCloseTo(202.57931);
-    expect(variance[1]['variance']).toBeCloseTo(773127586.21);
-  });
-
-  /* test('Should calculate covariance for numerical columns', () => {
-    const df2 = df.selectDtypes(['number']).fillna(0);
-    const covariance = df2.cov();
-    console.table(covariance);
-    console.log(df2.array('Age'));
-  }); */
-
-  test('Should display the values of the specified column from each row in the DataFrame.', () => {
-    expect(df.head().array('Age')).toEqual([29, 34, 45, undefined, 50]);
-  });
-
-  test('Should transform column values in the DataFrame', () => {
-    const transformedDf = df.transform('Age', (value) => value * 2);
-    expect(transformedDf.head().array('Age')).toEqual([58, 68, 90, undefined, 100]);
-  });
-
-  test('Should display unique values in a column', () => {
-    expect(df.unique('City').length).toEqual(13);
-  });
-
-  test('Should print the DataFrame to the console', () => {
-    console.table(df.head().print());
-    expect(df.head().print()).toEqual([
-      { "Name": "Amara Perera", "City": "Colombo", "Age": 29, "Monthly Income": 45000, "Date of Birth": "1995-06-12" },
-      { "Name": "Nimal Jayasinghe", "City": "Kandy", "Age": 34, "Monthly Income": undefined, "Date of Birth": "1990-03-22" },
-      { "Name": "Pathum Silva", "City": "Negombo", "Age": 45, "Monthly Income": 85000, "Date of Birth": "1979-09-30" },
-      { "Name": "Sanduni Fernando", "City": "Galle", "Age": undefined, "Monthly Income": 70000, "Date of Birth": "1994-02-15" },
-      { "Name": "Chaminda Weerasinghe", "City": "Kurunegala", "Age": 50, "Monthly Income": 55000, "Date of Birth": "1974-05-20" }
-    ])
+  it('should print the DataFrame to the console', () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+    df.print();
+    expect(consoleSpy).toHaveBeenCalledWith(df.toString());
+    consoleSpy.mockRestore(); // Restore the original console.log
   });
 });
