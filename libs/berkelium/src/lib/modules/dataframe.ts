@@ -274,6 +274,80 @@ export class DataFrame {
     return [...new Set(this._data[column])];
   }
 
+  describe(): any {
+    const descriptions: any = {};
+    for (const col of this._columns) {
+      const values = this._data[col];
+      if (typeof values[0] === 'number') {
+        descriptions[col] = {
+          count: this.count(col),
+          mean: this.mean(col),
+          median: this.median(col),
+          min: this.min(col),
+          max: this.max(col),
+          sum: this.sum(col),
+        };
+      } else {
+        descriptions[col] = {
+          count: this.count(col),
+          unique: this.unique(col).length,
+        };
+      }
+    }
+    return descriptions;
+  }
+
+  mean(column: string): number {
+    if (typeof this._data[column][0] !== 'number') {
+      throw new Error(`Column ${column} is not numeric.`);
+    }
+    const values = this._data[column];
+    const sum = values.reduce((acc, val) => acc + val, 0);
+    return sum / values.length;
+  }
+
+  median(column: string): number {
+    if (typeof this._data[column][0] !== 'number') {
+      throw new Error(`Column ${column} is not numeric.`);
+    }
+    const values = [...this._data[column]].sort((a, b) => a - b);
+    const mid = Math.floor(values.length / 2);
+    return values.length % 2 !== 0
+      ? values[mid]
+      : (values[mid - 1] + values[mid]) / 2;
+  }
+
+  sum(column: string): number {
+    if (typeof this._data[column][0] !== 'number') {
+      throw new Error(`Column ${column} is not numeric.`);
+    }
+    return this._data[column].reduce((acc, val) => acc + val, 0);
+  }
+
+  min(column: string): any {
+    return Math.min(...this._data[column]);
+  }
+
+  max(column: string): any {
+    return Math.max(...this._data[column]);
+  }
+
+  count(column: string): number {
+    return this._data[column].filter((val) => val !== undefined && val !== null)
+      .length;
+  }
+
+  valueCounts(column: string): { [value: string]: number } {
+    const counts: { [value: string]: number } = {};
+    for (const value of this._data[column]) {
+      if (counts[value] === undefined) {
+        counts[value] = 0;
+      }
+      counts[value]++;
+    }
+    return counts;
+  }
+
   private _getRow(rowIndex: number): any {
     const row: any = {};
     for (const col of this._columns) {

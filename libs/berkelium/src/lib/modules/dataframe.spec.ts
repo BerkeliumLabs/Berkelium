@@ -213,4 +213,60 @@ describe('DataFrame', () => {
       'Sydney',
     ]);
   });
+
+  it('should describe the DataFrame', () => {
+    const description = df.describe();
+    expect(description).toEqual({
+      age: {
+        count: 5,
+        mean: 30,
+        median: 30,
+        min: 25,
+        max: 35,
+        sum: 150,
+      },
+      name: {
+        count: 5,
+        unique: 5,
+      },
+      city: {
+        count: 5,
+        unique: 5,
+      },
+    });
+  });
+
+  it('should calculate the mean of a column', () => {
+    expect(df.mean('age')).toBe(30);
+  });
+
+  it('should calculate the median of a column', () => {
+    expect(df.median('age')).toBe(30);
+  });
+
+  it('should calculate the sum of a column', () => {
+    expect(df.sum('age')).toBe(150);
+  });
+
+  it('should calculate the minimum of a column', () => {
+    expect(df.min('age')).toBe(25);
+  });
+
+  it('should calculate the maximum of a column', () => {
+    expect(df.max('age')).toBe(35);
+  });
+
+  it('should count the non-null values in a column', () => {
+    expect(df.count('age')).toBe(5);
+  });
+
+  it('should calculate the value counts of a column', () => {
+    expect(df.valueCounts('city')).toEqual({
+      'New York': 1,
+      London: 1,
+      Paris: 1,
+      Tokyo: 1,
+      Sydney: 1,
+    });
+  });
 });
