@@ -348,6 +348,47 @@ export class DataFrame {
     return counts;
   }
 
+  toString(): string {
+    let output = '';
+    const header = this._columns.join('\t');
+    output += header + '\n';
+
+    for (let i = 0; i < this.rows(); i++) {
+      const row = this._columns.map((col) => this._data[col][i]).join('\t');
+      output += row + '\n';
+    }
+
+    return output;
+  }
+
+  toArray(): any[][] {
+    const array: any[][] = [];
+    for (let i = 0; i < this.rows(); i++) {
+      const row: any[] = [];
+      for (const col of this._columns) {
+        row.push(this._data[col][i]);
+      }
+      array.push(row);
+    }
+    return array;
+  }
+
+  toObjects(): any[] {
+    const objects: any[] = [];
+    for (let i = 0; i < this.rows(); i++) {
+      const obj: any = {};
+      for (const col of this._columns) {
+        obj[col] = this._data[col][i];
+      }
+      objects.push(obj);
+    }
+    return objects;
+  }
+
+  print(): void {
+    console.log(this.toString());
+  }
+
   private _getRow(rowIndex: number): any {
     const row: any = {};
     for (const col of this._columns) {

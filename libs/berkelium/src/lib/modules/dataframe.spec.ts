@@ -269,4 +269,38 @@ describe('DataFrame', () => {
       Sydney: 1,
     });
   });
+
+  it('should return a string representation of the DataFrame', () => {
+    const expectedString = `name\tage\tcity\nAlice\t25\tNew York\nBob\t30\tLondon\nCharlie\t35\tParis\nDavid\t28\tTokyo\nEve\t32\tSydney\n`;
+    expect(df.toString()).toBe(expectedString);
+  });
+
+  it('should return the data as a 2D array', () => {
+    const expectedArray = [
+      ['Alice', 25, 'New York'],
+      ['Bob', 30, 'London'],
+      ['Charlie', 35, 'Paris'],
+      ['David', 28, 'Tokyo'],
+      ['Eve', 32, 'Sydney'],
+    ];
+    expect(df.toArray()).toEqual(expectedArray);
+  });
+
+  it('should return the data as an array of objects', () => {
+    const expectedObjects = [
+      { name: 'Alice', age: 25, city: 'New York' },
+      { name: 'Bob', age: 30, city: 'London' },
+      { name: 'Charlie', age: 35, city: 'Paris' },
+      { name: 'David', age: 28, city: 'Tokyo' },
+      { name: 'Eve', age: 32, city: 'Sydney' },
+    ];
+    expect(df.toObjects()).toEqual(expectedObjects);
+  });
+
+  it('should print the DataFrame to the console', () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+    df.print();
+    expect(consoleSpy).toHaveBeenCalledWith(df.toString());
+    consoleSpy.mockRestore(); // Restore the original console.log
+  });
 });
